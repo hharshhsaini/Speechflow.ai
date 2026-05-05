@@ -42,11 +42,11 @@
         /* Sidebar */
         aside {
             width: var(--sidebar-width);
+            flex: 0 0 var(--sidebar-width);
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
             z-index: 100;
         }
 
@@ -97,10 +97,13 @@
         /* Main Content */
         main {
             flex: 1;
+            min-width: 0;
             overflow-y: auto;
             background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
 
         .tab-content {
@@ -279,8 +282,8 @@
         .lab-btn:hover { border-color: var(--accent); color: var(--accent); }
 
         /* Toasts */
-        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 1000; }
-        .toast { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 1rem; transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 1000; pointer-events: none; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 1rem; transform: translateX(120%); transition: transform 0.3s ease; pointer-events: auto; }
         .toast.visible { transform: translateX(0); }
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--error); }
@@ -305,23 +308,23 @@
             <p>Pro Neural Studio</p>
         </div>
         <nav>
-            <div class="nav-item active" onclick="switchTab('studio')">
+            <div class="nav-item active" data-tab="studio" onclick="switchTab('studio')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                 Studio
             </div>
-            <div class="nav-item" onclick="switchTab('reader')">
+            <div class="nav-item" data-tab="reader" onclick="switchTab('reader')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                 Book Reader
             </div>
-            <div class="nav-item" onclick="switchTab('lab')">
+            <div class="nav-item" data-tab="lab" onclick="switchTab('lab')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 Voice Lab
             </div>
-            <div class="nav-item" onclick="switchTab('history')">
+            <div class="nav-item" data-tab="history" onclick="switchTab('history')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 History
             </div>
-            <div class="nav-item" onclick="switchTab('settings')">
+            <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Settings
             </div>
@@ -483,12 +486,14 @@
 
         // --- CORE NAVIGATION ---
         function switchTab(t) {
+            console.log('Switching to tab:', t);
             currentTab = t;
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(`tab-${t}`).classList.add('active');
+            const targetTab = document.getElementById(`tab-${t}`);
+            if (targetTab) targetTab.classList.add('active');
             
             document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.toggle('active', n.innerText.toLowerCase().includes(t));
+                n.classList.toggle('active', n.dataset.tab === t);
             });
         }
 
@@ -565,6 +570,7 @@
         let recognition = null;
         let isSTTActive = false;
         let committedText = "";
+        let sttDesired = false;
 
         function setupSTT() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -590,12 +596,22 @@
                 document.getElementById('stop-svg').classList.remove('hidden');
                 document.getElementById('dictation-bar').classList.add('active');
             };
+            recognition.onerror = (e) => {
+                sttDesired = false;
+                showToast("Mic error: " + (e && e.error ? e.error : "unknown"), "error");
+            };
             recognition.onend = () => {
                 isSTTActive = false;
                 document.getElementById('micBtn').classList.remove('active');
                 document.getElementById('mic-svg').classList.remove('hidden');
                 document.getElementById('stop-svg').classList.add('hidden');
                 document.getElementById('dictation-bar').classList.remove('active');
+
+                if (sttDesired) {
+                    setTimeout(() => {
+                        try { recognition.start(); } catch (e) {}
+                    }, 200);
+                }
             };
         }
 
@@ -612,8 +628,14 @@
         }
         function toggleSTT() {
             if (!recognition) setupSTT();
-            if (!isSTTActive) { committedText = document.getElementById('textInput').value; recognition.start(); }
-            else recognition.stop();
+            if (!isSTTActive) {
+                sttDesired = true;
+                committedText = document.getElementById('textInput').value;
+                try { recognition.start(); } catch (e) {}
+            } else {
+                sttDesired = false;
+                recognition.stop();
+            }
         }
         function clearWorkspace() { document.getElementById('textInput').value = ""; committedText = ""; updateStudioStats(); }
         
@@ -649,8 +671,6 @@
         let readerAudio = new Audio();
         let wordTimings = [];
         let isReading = false;
-
-        let chunkDurationOffset = 0;
 
         async function handlePDFUpload(e) {
             const file = e.target.files[0];
@@ -875,7 +895,24 @@
             showToast("Voice audit complete", "success");
         }
 
-        window.onload = () => { loadVoices(); switchTab('studio'); };
+        window.onload = () => { 
+            console.log("Studio Initialization Started");
+            // Load voices in background, don't block the UI
+            loadVoices().then(() => {
+                console.log("Neural Voices Loaded");
+            }).catch(err => {
+                console.error("Voice Loading Error:", err);
+            });
+            
+            // Sync sidebar highlight with current active tab in HTML
+            const activeTab = document.querySelector('.tab-content.active');
+            if (activeTab) {
+                const tabId = activeTab.id.replace('tab-', '');
+                document.querySelectorAll('.nav-item').forEach(n => {
+                    n.classList.toggle('active', n.dataset.tab === tabId);
+                });
+            }
+        };
     </script>
 </body>
 </html>
