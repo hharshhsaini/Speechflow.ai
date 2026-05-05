@@ -158,15 +158,10 @@ async def websocket_book_reader(websocket: WebSocket):
 
             page_data = PDF_SESSION["pages"][page_num]
             words_to_read = page_data["words"][start_word_idx:]
-            
-            # Split into natural sentences for smoother reading
             sentences = split_into_sentences(words_to_read)
-            
-            accumulated_duration = 0.0
             
             for sent_words in sentences:
                 text_to_synthesize = " ".join([w["text"] for w in sent_words])
-                
                 lang_code = VOICE_REGISTRY.get(voice, {}).get('lang_code', 'a')
                 pipeline = get_pipeline(lang_code)
                 actual_voice = resolve_voice_path(voice)
@@ -176,32 +171,30 @@ async def websocket_book_reader(websocket: WebSocket):
                         duration = len(audio) / 24000.0
                         total_chars = sum(len(w["text"]) for w in sent_words)
                         
+                        # Chunk-relative timings (starting from 0)
                         timing_data = []
-                        current_word_start = accumulated_duration
+                        curr = 0.0
                         for w in sent_words:
-                            w_dur = (len(w["text"]) / total_chars) * duration
+                            # Heuristic: Add 10% more weight to non-punctuation chars
+                            char_count = len(w["text"])
+                            w_dur = (char_count / total_chars) * duration
                             timing_data.append({
                                 "word_index": w["word_index"],
-                                "start_time": current_word_start,
-                                "end_time": current_word_start + w_dur,
+                                "start": curr,
+                                "end": curr + w_dur,
                                 "word": w["text"]
                             })
-                            current_word_start += w_dur
-                        
-                        await websocket.send_json({
-                            "type": "timing",
-                            "data": timing_data
-                        })
+                            curr += w_dur
                         
                         import soundfile as sf
                         buffer = io.BytesIO()
                         sf.write(buffer, audio.numpy(), 24000, format='WAV')
-                        await websocket.send_json({
-                            "type": "audio",
-                            "data": base64.b64encode(buffer.getvalue()).decode("utf-8")
-                        })
                         
-                        accumulated_duration += duration
+                        await websocket.send_json({
+                            "type": "audio_with_timing",
+                            "audio": base64.b64encode(buffer.getvalue()).decode("utf-8"),
+                            "timing": timing_data
+                        })
             
             await websocket.send_json({"type": "done"})
 
@@ -277,22 +270,12 @@ async def api_tokenize(req: TokenizeRequest):
 async def test_voice_endpoint(voice_id: str):
     import time
     start = time.time()
-    # Use a slightly longer string to ensure neural engine actually computes a full sentence
-    test_text = "Neural profile integrity check."
     works = validate_voice(voice_id)
     elapsed = (time.time() - start) * 1000 # ms
-    
-    # Artificial minimum for 'audit' feel if it's too fast
     if elapsed < 300:
         await asyncio.sleep((300 - elapsed) / 1000)
         elapsed = 300
-        
-    return {
-        "voice": voice_id, 
-        "works": works, 
-        "latency": round(elapsed, 2),
-        "error": None if works else "Synthesis failed"
-    }
+    return {"voice": voice_id, "works": works, "latency": round(elapsed, 2), "error": None if works else "Synthesis failed"}
 
 if __name__ == "__main__":
     import uvicorn

@@ -759,11 +759,12 @@
             
             ws.onmessage = async (e) => {
                 const d = JSON.parse(e.data);
-                if (d.type === 'timing') {
-                    wordTimings = wordTimings.concat(d.data);
-                } else if (d.type === 'audio') {
-                    const blob = await (await fetch(`data:audio/wav;base64,${d.data}`)).blob();
-                    audioQueue.push(URL.createObjectURL(blob));
+                if (d.type === 'audio_with_timing') {
+                    const blob = await (await fetch(`data:audio/wav;base64,${d.audio}`)).blob();
+                    audioQueue.push({
+                        src: URL.createObjectURL(blob),
+                        timing: d.timing
+                    });
                     if (!isPlayingChunk && isReading) playNextChunk();
                 }
             };
@@ -774,8 +775,11 @@
                     return;
                 }
                 isPlayingChunk = true;
-                const src = audioQueue.shift();
-                readerAudio.src = src;
+                const chunk = audioQueue.shift();
+                
+                // Store current chunk timing for the loop
+                currentChunkTiming = chunk.timing;
+                readerAudio.src = chunk.src;
                 
                 readerAudio.onloadedmetadata = () => {
                     if (isReading) {
@@ -785,20 +789,18 @@
                 };
 
                 readerAudio.onended = () => {
-                    chunkDurationOffset += readerAudio.duration;
                     playNextChunk();
                 };
             }
         }
 
+        let currentChunkTiming = [];
+
         function readerLoop() {
             if (!isReading || readerAudio.paused) return;
             
-            // Precise sync: use audio context time or just currentTime
-            const totalElapsed = chunkDurationOffset + readerAudio.currentTime;
-            
-            // Find word with binary search or just find (array is small)
-            const word = wordTimings.find(wt => totalElapsed >= wt.start_time && totalElapsed <= wt.end_time);
+            const t = readerAudio.currentTime;
+            const word = currentChunkTiming.find(wt => t >= wt.start && t <= wt.end);
             
             if (word) {
                 const s = document.getElementById(`rw-${word.word_index}`);
