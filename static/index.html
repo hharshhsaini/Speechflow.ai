@@ -881,18 +881,30 @@
         }
 
         async function testAllVoices() {
-            showToast("Starting mass voice audit...", "info");
+            showToast("Starting mass voice audit with audio previews...", "info");
             const voiceIds = [];
+            const voiceNames = [];
             for (const lang in allVoices) {
-                allVoices[lang].forEach(v => voiceIds.push(v.id));
+                allVoices[lang].forEach(v => {
+                    voiceIds.push(v.id);
+                    voiceNames.push(v.name);
+                });
             }
             
-            for (const id of voiceIds) {
+            for (let i = 0; i < voiceIds.length; i++) {
+                const id = voiceIds[i];
+                const name = voiceNames[i];
+                
+                // Trigger Health Check (Visual)
                 await testVoice(id);
-                // Moderate delay for 'thorough scan' feeling
-                await new Promise(r => setTimeout(r, 400));
+                
+                // Trigger Audio Preview
+                await previewVoice(id, name);
+                
+                // Wait for audio snippet (approx 2.5s) before next one
+                await new Promise(r => setTimeout(r, 2500));
             }
-            showToast("Voice audit complete", "success");
+            showToast("Mass audio audit complete", "success");
         }
 
         window.onload = () => { 
