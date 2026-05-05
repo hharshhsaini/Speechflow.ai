@@ -13,3 +13,4 @@ pydub
 soundfile
 python-dotenv
 PyMuPDF
+nltk

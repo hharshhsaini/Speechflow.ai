@@ -6,246 +6,560 @@
     <title>SpeechFlow | Pro Neural Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #030712;
-            --surface: #111827;
-            --surface-lighter: #1f2937;
-            --primary: #f97316;
-            --primary-glow: rgba(249, 115, 22, 0.2);
-            --secondary: #6366f1;
-            --text: #f9fafb;
-            --text-muted: #9ca3af;
-            --border: #374151;
-            --accent-error: #ef4444;
-            --accent-success: #22c55e;
-            --glass: rgba(17, 24, 39, 0.7);
+            --bg-primary: #0f172a;
+            --bg-sidebar: #0b1120;
+            --bg-card: #1e293b;
+            --bg-input: #0d0d0d;
+            --accent: #f97316;
+            --accent-hover: #ea6a0a;
+            --accent-glow: rgba(249, 115, 22, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --success: #22c55e;
+            --error: #ef4444;
+            --sidebar-width: 240px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        * { box-sizing: border-box; transition: background-color var(--transition), border-color var(--transition), transform var(--transition); }
         
         body {
             margin: 0;
             padding: 0;
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bg);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(249, 115, 22, 0.1) 0px, transparent 50%);
-            color: var(--text);
-            min-height: 100vh;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             display: flex;
-            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .container { width: 100%; max-width: 1400px; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
+        /* Sidebar */
+        aside {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 100;
+        }
 
-        header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        .brand h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; }
-        .brand h1 span { color: var(--primary); }
-        .brand p { margin: 0.2rem 0 0 0; color: var(--text-muted); font-size: 1rem; font-weight: 300; }
+        .logo-area {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
 
-        .hardware-badge { background: var(--surface-lighter); padding: 0.4rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+        .logo-area h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .logo-area h1 span { color: var(--accent); }
+        .logo-area p { margin: 0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
 
-        /* Navigation Tabs */
-        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
-        .nav-tab { padding: 0.75rem 1.5rem; border-radius: 1rem 1rem 0 0; cursor: pointer; font-weight: 700; color: var(--text-muted); border-bottom: 3px solid transparent; }
-        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--surface-lighter); }
+        nav { padding: 1.5rem 0.75rem; flex: 1; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent);
+            border-left: 3px solid var(--accent);
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .nav-item svg { width: 1.25rem; height: 1.25rem; }
 
-        .panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; }
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
 
-        /* STUDIO TAB */
-        .studio-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; }
-        .workspace-container { position: relative; background: #000; border: 1px solid var(--border); border-radius: 1rem; overflow: hidden; }
-        #textInput { width: 100%; height: 350px; color: #fff; padding: 1.25rem; font-size: 1.25rem; line-height: 1.6; outline: none; overflow-y: auto; white-space: pre-wrap; }
-        .interim { color: var(--text-muted); font-style: italic; }
-        .clear-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: var(--surface-lighter); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.7rem; padding: 0.3rem 0.6rem; border-radius: 0.5rem; cursor: pointer; z-index: 5; }
+        /* Main Content */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* BOOK READER TAB */
-        .reader-container { display: flex; gap: 1.5rem; height: calc(100vh - 250px); min-height: 600px; }
+        .tab-content {
+            padding: 2.5rem;
+            display: none;
+            flex-direction: column;
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .tab-content.active { display: flex; }
+
+        .tab-header h2 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -0.02em; }
+        .tab-header p { margin: 0.5rem 0 0 0; color: var(--text-secondary); }
+
+        /* Studio Workspace */
+        .section-label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1rem; }
+
+        .workspace-wrapper { position: relative; }
+        .textarea-container {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            min-height: 250px;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .textarea-container:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
         
-        .pdf-panel { flex: 4; background: #000; border-radius: 1rem; position: relative; overflow: auto; display: flex; justify-content: center; border: 1px solid var(--border); }
-        .pdf-viewport { position: relative; width: fit-content; height: fit-content; }
-        #pdfImage { display: block; max-width: 100%; height: auto; pointer-events: none; }
-        .pdf-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .pdf-word { position: absolute; background: transparent; pointer-events: auto; cursor: pointer; }
-        .pdf-word.word-current { background: rgba(249, 115, 22, 0.4); border-radius: 2px; }
+        #textInput {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+        }
 
-        .text-panel { flex: 6; background: var(--surface); border-radius: 1rem; padding: 2rem; overflow-y: auto; border: 1px solid var(--border); line-height: 2; font-size: 1.3rem; position: relative; }
-        .reader-word { cursor: pointer; border-radius: 3px; padding: 0 2px; }
-        .reader-word:hover { background: var(--surface-lighter); }
-        .word-current { background: var(--primary) !important; color: #000; font-weight: 700; box-shadow: 0 4px 12px var(--primary-glow); }
-        .word-read { background: rgba(99, 102, 241, 0.15); color: var(--text-muted); }
+        .floating-mic {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 4.5rem;
+            height: 4.5rem;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px var(--accent-glow);
+            z-index: 10;
+        }
+        .floating-mic:hover { transform: scale(1.05); background: var(--accent-hover); }
+        .floating-mic svg { width: 2rem; height: 2rem; fill: white; }
 
-        .reader-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--surface-lighter); padding: 1rem 2rem; border-radius: 1rem; border: 1px solid var(--border); }
-        .reader-btn-large { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .reader-btn-small { background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.9rem; }
+        .char-count { position: absolute; bottom: 1.5rem; left: 1.5rem; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
 
-        /* Common Components */
-        .hidden { display: none !important; }
-        .mic-btn { width: 4rem; height: 4rem; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; position: absolute; bottom: 1.5rem; right: 1.5rem; display: flex; align-items: center; justify-content: center; }
-        .mic-btn.active { animation: ring-pulse 1.5s infinite; }
-        @keyframes ring-pulse { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } }
-        
-        .spinner { width: 1.2rem; height: 1.2rem; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .dictation-bar {
+            background: rgba(249, 115, 22, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .dictation-bar.active { display: flex; }
 
-        .waveform { display: none; align-items: center; gap: 3px; height: 20px; }
-        .waveform.active { display: flex; }
-        .wave-bar { width: 3px; background: var(--primary); height: 8px; border-radius: 2px; }
+        .waveform { display: flex; align-items: center; gap: 4px; height: 24px; }
+        .wave-bar { width: 4px; background: var(--accent); border-radius: 10px; height: 10px; }
         .wave-bar:nth-child(1) { animation: wave 0.8s infinite; }
         .wave-bar:nth-child(2) { animation: wave 0.8s infinite 0.1s; }
         .wave-bar:nth-child(3) { animation: wave 0.8s infinite 0.2s; }
-        @keyframes wave { 0%, 100% { height: 6px; } 50% { height: 18px; } }
+        .wave-bar:nth-child(4) { animation: wave 0.8s infinite 0.3s; }
+        .wave-bar:nth-child(5) { animation: wave 0.8s infinite 0.4s; }
+        @keyframes wave { 0%, 100% { height: 8px; } 50% { height: 24px; } }
 
-        .progress-bar { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
+        .interim-display { font-style: italic; color: var(--text-secondary); font-size: 0.95rem; }
 
-        #upload-zone { border: 2px dashed var(--border); border-radius: 1rem; padding: 4rem; text-align: center; cursor: pointer; width: 100%; }
-        #upload-zone:hover { border-color: var(--primary); background: rgba(249, 115, 22, 0.05); }
+        .shortcuts-row { display: flex; gap: 0.75rem; margin-top: 1rem; }
+        .btn-shortcut { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+        .btn-shortcut:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Voice Registry Cards */
+        .filter-pills { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .pill { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); padding: 0.5rem 1.25rem; border-radius: 99px; cursor: pointer; font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+        .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .voice-scroll-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .lang-group-row { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scrollbar-width: thin; }
+        .voice-card {
+            min-width: 140px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .voice-card:hover { border-color: var(--accent-glow); transform: translateY(-4px); }
+        .voice-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        
+        .avatar { width: 3.5rem; height: 3.5rem; background: var(--bg-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.75rem; border: 2px solid var(--border); }
+        .voice-card.selected .avatar { border-color: var(--accent); color: var(--accent); }
+
+        .voice-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+        .voice-meta { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .quality-badge { position: absolute; top: 0.5rem; right: 0.5rem; font-size: 0.7rem; background: rgba(0,0,0,0.3); padding: 0.2rem 0.4rem; border-radius: 4px; color: #fbbf24; }
+
+        .checkmark { position: absolute; top: 0.5rem; left: 0.5rem; color: var(--accent); display: none; }
+        .voice-card.selected .checkmark { display: block; }
+
+        /* Speed Section */
+        .speed-panel { background: var(--bg-card); border-radius: 1rem; padding: 1.5rem; border: 1px solid var(--border); }
+        .speed-presets { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+        /* Output / Neural Section */
+        .output-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+        .audio-container { background: #000; border-radius: 1.25rem; padding: 2rem; border: 1px solid var(--border); }
+        audio { width: 100%; filter: invert(1); height: 40px; margin-bottom: 1.5rem; }
+
+        .tokens-panel { background: #000; border-radius: 1.25rem; padding: 1.5rem; border: 1px solid var(--border); min-height: 250px; }
+        .tokens-content { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
+
+        .btn-action-large {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            box-shadow: 0 20px 40px -10px var(--accent-glow);
+        }
+        .btn-action-large:hover { transform: translateY(-4px); background: var(--accent-hover); }
+
+        /* Reader Tab Styling */
+        .reader-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.5rem; height: 600px; }
+        .pdf-box { background: #000; border-radius: 1rem; border: 1px solid var(--border); overflow: auto; position: relative; display: flex; justify-content: center; }
+        .text-box { background: var(--bg-card); border-radius: 1rem; border: 1px solid var(--border); padding: 2.5rem; overflow-y: auto; font-size: 1.3rem; line-height: 2.2; }
+        
+        .reader-word { cursor: pointer; border-radius: 4px; padding: 0 4px; transition: none; }
+        .reader-word.current { background: var(--accent) !important; color: #000; font-weight: 800; }
+        .reader-word.read { color: var(--text-muted); background: rgba(255,255,255,0.03); }
+
+        /* Voice Lab */
+        .lab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .lab-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+        .lab-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .lab-btn { background: var(--bg-primary); border: 1px solid var(--border); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
+        .lab-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Toasts */
+        .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 1000; }
+        .toast { background: var(--bg-card); border-left: 4px solid var(--accent); padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 1rem; transform: translateX(120%); transition: transform 0.3s ease; }
+        .toast.visible { transform: translateX(0); }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--error); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .hidden { display: none !important; }
+        .spinner { width: 1.5rem; height: 1.5rem; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <div class="brand">
-                <h1>SpeechFlow<span>.ai</span></h1>
-                <p>Advanced Neural Studio | Pro Suite</p>
-            </div>
-            <div class="hardware-badge">
-                <span id="hw-status" style="color: var(--accent-success)">●</span> Local AI Engine Ready
-            </div>
-        </header>
-
-        <div class="nav-tabs">
-            <div id="tab-btn-studio" class="nav-tab active" onclick="switchTab('studio')">Studio Workspace</div>
-            <div id="tab-btn-reader" class="nav-tab" onclick="switchTab('reader')">Book Reader</div>
+    <aside>
+        <div class="logo-area">
+            <h1>Speech<span>Flow</span></h1>
+            <p>Pro Neural Studio</p>
         </div>
+        <nav>
+            <div class="nav-item active" onclick="switchTab('studio')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                Studio
+            </div>
+            <div class="nav-item" onclick="switchTab('reader')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Book Reader
+            </div>
+            <div class="nav-item" onclick="switchTab('lab')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                Voice Lab
+            </div>
+            <div class="nav-item" onclick="switchTab('history')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                History
+            </div>
+            <div class="nav-item" onclick="switchTab('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                Settings
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="status-dot"></div> Local Engine Active
+        </div>
+    </aside>
 
-        <!-- STUDIO WORKSPACE -->
-        <div id="view-studio" class="tab-view">
-            <div class="studio-grid">
-                <div class="panel">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Workspace</h2>
-                        <div id="mic-viz" class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
-                    </div>
-                    <div class="workspace-container">
-                        <button class="clear-btn" onclick="clearWorkspace()">CLEAR</button>
-                        <div id="textInput" contenteditable="true" placeholder="Start typing or use the mic..."></div>
-                        <button id="micBtn" class="mic-btn" onclick="toggleSTT()">
-                            <svg id="mic-svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+    <main>
+        <!-- STUDIO TAB -->
+        <div id="tab-studio" class="tab-content active">
+            <div class="tab-header">
+                <h2>Studio</h2>
+                <p>Type or dictate — then synthesize with neural precision.</p>
+            </div>
+
+            <section>
+                <div class="section-label">Workspace</div>
+                <div class="workspace-wrapper">
+                    <div class="textarea-container">
+                        <textarea id="textInput" placeholder="Enter text or click mic to dictate live..."></textarea>
+                        <button class="floating-mic" id="micBtn" onclick="toggleSTT()">
+                            <svg id="mic-svg" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                             <rect id="stop-svg" class="hidden" x="7" y="7" width="10" height="10" fill="white" />
                         </button>
+                        <div class="char-count"><span id="char-val">0</span> / 5000</div>
                     </div>
-                    <div style="display: flex; justify-content: flex-end; gap: 1rem; font-size: 0.7rem; color: var(--text-muted);">
-                        <span id="studio-word-count">0 words</span> | <span id="studio-char-count">0 chars</span>
+                    <div id="dictation-bar" class="dictation-bar">
+                        <div class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+                        <div style="font-weight: 700; font-size: 0.8rem; color: var(--accent);">LISTENING...</div>
+                        <div id="interim-text" class="interim-display">Speaking...</div>
                     </div>
-                    <div class="studio-controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div>
-                            <label style="display: block; font-size: 0.7rem; margin-bottom: 0.5rem; color: var(--text-muted);">VOICE PROFILE</label>
-                            <select id="voiceSelect" style="width: 100%; background: var(--surface-lighter); color: white; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--border);"></select>
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 0.7rem; margin-bottom: 0.5rem; color: var(--text-muted);">SPEED</label>
-                            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
-                        </div>
+                    <div class="shortcuts-row">
+                        <button class="btn-shortcut" onclick="setPreset('quote')">Quote</button>
+                        <button class="btn-shortcut" onclick="setPreset('gatsby')">Gatsby</button>
+                        <button class="btn-shortcut" onclick="clearWorkspace()">Reset</button>
                     </div>
-                    <button id="genBtn" class="btn-action" style="background: var(--primary); color: white; padding: 1rem; border-radius: 1rem; font-weight: 700; border: none; cursor: pointer;" onclick="generateAudio()">GENERATE NEURAL MASTER</button>
-                    <audio id="genAudio" controls style="width: 100%; filter: invert(1); height: 40px;"></audio>
                 </div>
-                <div class="panel">
-                    <h2 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Neural Tokens</h2>
-                    <div id="tokensOutput" style="background: #000; padding: 1rem; border-radius: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--primary); min-height: 200px; white-space: pre-wrap;">Tokens will appear here...</div>
+            </section>
+
+            <section>
+                <div class="section-label">Speaker Profile</div>
+                <div class="filter-pills">
+                    <div class="pill active" onclick="filterVoices('all')">All</div>
+                    <div class="pill" onclick="filterVoices('American English')">🇺🇸 EN-US</div>
+                    <div class="pill" onclick="filterVoices('British English')">🇬🇧 EN-GB</div>
+                    <div class="pill" onclick="filterVoices('Japanese')">🇯🇵 JA</div>
+                    <div class="pill" onclick="filterVoices('Hindi')">🇮🇳 HI</div>
+                    <div class="pill" onclick="filterVoices('Chinese')">🇨🇳 ZH</div>
+                </div>
+                <div id="voice-scroll" class="voice-scroll-area">
+                    <!-- Groups and Cards dynamically injected -->
+                </div>
+            </section>
+
+            <section class="output-grid">
+                <div class="audio-panel">
+                    <div class="section-label">Output Master</div>
+                    <div class="audio-container">
+                        <audio id="genAudio" controls></audio>
+                        <button id="genBtn" class="btn-action-large" onclick="generateAudio()">
+                            <div id="genSpinner" class="spinner hidden"></div>
+                            <span id="genText">Generate Master</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="neural-panel">
+                    <div class="section-label">Neural Tokens</div>
+                    <div class="tokens-panel">
+                        <div id="tokensOutput" class="tokens-content">Awaiting generation...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- READER TAB -->
+        <div id="tab-reader" class="tab-content">
+            <div class="tab-header">
+                <h2>Book Reader</h2>
+                <p>Upload a PDF and listen with synchronized word highlighting.</p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; align-items: center; background: var(--bg-card); padding: 1rem; border-radius: 1rem; border: 1px solid var(--border);">
+                <button class="btn-shortcut" style="background: var(--accent); border: none" onclick="document.getElementById('pdf-upload').click()">Upload PDF</button>
+                <input type="file" id="pdf-upload" class="hidden" accept=".pdf" onchange="handlePDFUpload(event)">
+                <div style="flex: 1; text-align: center; font-weight: 700;" id="reader-page-info">Page 0 of 0</div>
+                <button class="btn-shortcut" onclick="changePage(-1)">PREV</button>
+                <button class="btn-shortcut" onclick="changePage(1)">NEXT</button>
+                <button id="readerPlayBtn" class="floating-mic" style="position: static; width: 3.5rem; height: 3.5rem;" onclick="toggleReaderPlay()">
+                    <svg id="r-play" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="r-pause" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+            </div>
+
+            <div class="reader-layout">
+                <div class="pdf-box">
+                    <div id="pdf-viewport" style="position: relative;">
+                        <img id="pdfImage" src="" alt="">
+                        <div id="pdf-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+                    </div>
+                </div>
+                <div id="reader-text" class="text-box">
+                    <div style="text-align: center; color: var(--text-muted); margin-top: 5rem;">Upload a PDF to begin.</div>
                 </div>
             </div>
         </div>
 
-        <!-- BOOK READER -->
-        <div id="view-reader" class="tab-view hidden">
-            <div class="panel" style="gap: 1rem;">
-                <div class="reader-controls">
-                    <button class="reader-btn-small" onclick="document.getElementById('pdf-upload').click()">Upload PDF</button>
-                    <input type="file" id="pdf-upload" class="hidden" accept=".pdf" onchange="handlePDFUpload(event)">
-                    
-                    <select id="readerVoiceSelect" style="background: var(--surface); color: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border);"></select>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <button class="reader-btn-small" onclick="changePage(-1)">PREV</button>
-                        <span id="page-info" style="font-size: 0.8rem; font-weight: 700;">Page 0 of 0</span>
-                        <button class="reader-btn-small" onclick="changePage(1)">NEXT</button>
-                    </div>
-
-                    <div style="flex: 1; display: flex; justify-content: center; gap: 1rem;">
-                        <button id="readerPlayBtn" class="reader-btn-large" onclick="toggleReaderPlay()">
-                            <svg id="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                            <svg id="pause-icon" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                        </button>
-                        <button class="reader-btn-large" style="background: var(--surface-lighter);" onclick="stopReader()">
-                            <rect x="7" y="7" width="10" height="10" fill="white" />
-                        </button>
-                    </div>
-
-                    <div class="progress-bar"><div id="read-progress" class="progress-fill"></div></div>
+        <!-- VOICE LAB -->
+        <div id="tab-lab" class="tab-content">
+            <div class="tab-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h2>Voice Lab</h2>
+                    <p>Audit and test all 54 neural voice profiles.</p>
                 </div>
+                <button class="btn-shortcut" style="background: var(--accent); border: none; padding: 0.75rem 1.5rem" onclick="testAllVoices()">Test All Voices</button>
+            </div>
+            <div id="lab-grid" class="lab-grid">
+                <!-- Cards injected -->
+            </div>
+        </div>
 
-                <div id="upload-prompt" class="hidden">
-                    <div id="upload-zone" onclick="document.getElementById('pdf-upload').click()">
-                        <h3 style="margin-bottom: 0.5rem;">Ready to Read?</h3>
-                        <p style="color: var(--text-muted);">Drop a PDF here or click to browse</p>
-                    </div>
+        <!-- HISTORY -->
+        <div id="tab-history" class="tab-content">
+            <div class="tab-header">
+                <h2>History</h2>
+                <p>Your past neural generations.</p>
+            </div>
+            <div style="text-align: center; color: var(--text-muted); margin-top: 10rem;">Session history is currently held in memory.</div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="tab-settings" class="tab-content">
+            <div class="tab-header">
+                <h2>Settings</h2>
+                <p>Global studio configuration.</p>
+            </div>
+            <div style="max-width: 600px; background: var(--bg-card); padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
+                <div class="section-label">Engine Config</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <span>Neural Model</span>
+                    <span style="color: var(--accent); font-weight: 700;">WHISPER SMALL</span>
                 </div>
-
-                <div id="reader-workspace" class="reader-container">
-                    <div class="pdf-panel">
-                        <div id="pdf-viewport" class="pdf-viewport">
-                            <img id="pdfImage" src="" alt="PDF Page">
-                            <div id="pdf-overlay" class="pdf-overlay"></div>
-                        </div>
-                    </div>
-                    <div id="text-panel" class="text-panel">
-                        <div style="text-align: center; color: var(--text-muted); margin-top: 5rem;">Upload a PDF to start your session</div>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Sampling Rate</span>
+                    <span style="font-weight: 700;">24,000 Hz</span>
                 </div>
             </div>
         </div>
-    </div>
+
+    </main>
+
+    <div id="toast-container" class="toast-container"></div>
 
     <script>
-        // --- COMMON LOGIC ---
-        const voiceSelects = [document.getElementById('voiceSelect'), document.getElementById('readerVoiceSelect')];
+        let allVoices = {};
+        let selectedVoiceId = 'af_heart';
         let currentTab = 'studio';
 
-        async function fetchVoices() {
-            const res = await fetch('/voices');
-            const groups = await res.json();
-            voiceSelects.forEach(sel => {
-                sel.innerHTML = '';
-                for (const lang in groups) {
-                    const group = document.createElement('optgroup');
-                    group.label = lang;
-                    groups[lang].forEach(v => {
-                        const opt = document.createElement('option');
-                        opt.value = v.id; opt.textContent = `${v.name} (${v.gender})`;
-                        group.appendChild(opt);
-                    });
-                    sel.appendChild(group);
-                }
+        // --- CORE NAVIGATION ---
+        function switchTab(t) {
+            currentTab = t;
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${t}`).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.toggle('active', n.innerText.toLowerCase().includes(t));
             });
         }
 
-        function switchTab(t) {
-            currentTab = t;
-            document.getElementById('tab-btn-studio').classList.toggle('active', t === 'studio');
-            document.getElementById('tab-btn-reader').classList.toggle('active', t === 'reader');
-            document.getElementById('view-studio').classList.toggle('hidden', t !== 'studio');
-            document.getElementById('view-reader').classList.toggle('hidden', t !== 'reader');
+        // --- TOASTS ---
+        function showToast(msg, type='info') {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerText = msg;
+            container.appendChild(t);
+            setTimeout(() => t.classList.add('visible'), 10);
+            setTimeout(() => {
+                t.classList.remove('visible');
+                setTimeout(() => t.remove(), 300);
+            }, 3000);
         }
 
-        window.onload = () => { fetchVoices(); switchTab('studio'); };
+        // --- VOICE LOADING ---
+        async function loadVoices() {
+            try {
+                const res = await fetch('/voices');
+                allVoices = await res.json();
+                renderVoiceCards();
+                renderVoiceLab();
+            } catch (err) { showToast("Failed to load voices", "error"); }
+        }
+
+        function renderVoiceCards(filter = 'all') {
+            const container = document.getElementById('voice-scroll');
+            container.innerHTML = '';
+            
+            for (const lang in allVoices) {
+                if (filter !== 'all' && lang !== filter) continue;
+                
+                const group = document.createElement('div');
+                group.className = 'lang-group';
+                group.innerHTML = `<div class="section-label">${lang}</div>`;
+                
+                const row = document.createElement('div');
+                row.className = 'lang-group-row';
+                
+                allVoices[lang].forEach(v => {
+                    const card = document.createElement('div');
+                    card.className = `voice-card ${v.id === selectedVoiceId ? 'selected' : ''}`;
+                    card.onclick = () => selectVoice(v.id);
+                    
+                    const initials = v.name.split(' ').map(n => n[0]).join('');
+                    card.innerHTML = `
+                        <div class="checkmark">✓</div>
+                        <div class="quality-badge">${v.quality}</div>
+                        <div class="avatar">${initials}</div>
+                        <div class="voice-name">${v.name}</div>
+                        <div class="voice-meta">${v.gender}</div>
+                    `;
+                    row.appendChild(card);
+                });
+                group.appendChild(row);
+                container.appendChild(group);
+            }
+        }
+
+        function selectVoice(id) {
+            selectedVoiceId = id;
+            document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
+            renderVoiceCards(document.querySelector('.pill.active').innerText === 'All' ? 'all' : document.querySelector('.pill.active').innerText);
+        }
+
+        function filterVoices(lang) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.innerText.includes(lang) || (lang === 'all' && p.innerText === 'All')));
+            renderVoiceCards(lang);
+        }
 
         // --- STUDIO LOGIC ---
         let recognition = null;
@@ -263,9 +577,10 @@
                     if (e.results[i].isFinal) {
                         committedText += (committedText ? " " : "") + e.results[i][0].transcript;
                         refineStudioText(e.results[i][0].transcript);
-                    } else { interim += e.results[i][0].transcript; }
+                    } else interim += e.results[i][0].transcript;
                 }
-                document.getElementById('textInput').innerHTML = committedText + ` <span class="interim">${interim}</span>`;
+                document.getElementById('textInput').value = committedText + interim;
+                document.getElementById('interim-text').innerText = interim || "Speaking...";
                 updateStudioStats();
             };
             recognition.onstart = () => {
@@ -273,240 +588,203 @@
                 document.getElementById('micBtn').classList.add('active');
                 document.getElementById('mic-svg').classList.add('hidden');
                 document.getElementById('stop-svg').classList.remove('hidden');
-                document.getElementById('mic-viz').classList.add('active');
+                document.getElementById('dictation-bar').classList.add('active');
             };
             recognition.onend = () => {
                 isSTTActive = false;
                 document.getElementById('micBtn').classList.remove('active');
                 document.getElementById('mic-svg').classList.remove('hidden');
                 document.getElementById('stop-svg').classList.add('hidden');
-                document.getElementById('mic-viz').classList.remove('active');
+                document.getElementById('dictation-bar').classList.remove('active');
             };
         }
 
         async function refineStudioText(t) {
             const res = await fetch('/refine-transcript', { method: 'POST', body: JSON.stringify({text: t}) });
             const data = await res.json();
-            if (data.changed) { committedText = committedText.replace(t, data.refined); renderStudioText(); }
+            if (data.changed) { committedText = committedText.replace(t, data.refined); renderStudioText(); showToast("Transcript refined", "info"); }
         }
 
-        function renderStudioText() { document.getElementById('textInput').innerText = committedText; updateStudioStats(); }
+        function renderStudioText() { document.getElementById('textInput').value = committedText; updateStudioStats(); }
         function updateStudioStats() {
-            const txt = document.getElementById('textInput').innerText;
-            document.getElementById('studio-word-count').innerText = `${txt ? txt.split(/\s+/).length : 0} words`;
-            document.getElementById('studio-char-count').innerText = `${txt.length} chars`;
+            const txt = document.getElementById('textInput').value;
+            document.getElementById('char-val').innerText = txt.length;
         }
         function toggleSTT() {
             if (!recognition) setupSTT();
-            if (!isSTTActive) { committedText = document.getElementById('textInput').innerText; recognition.start(); }
+            if (!isSTTActive) { committedText = document.getElementById('textInput').value; recognition.start(); }
             else recognition.stop();
         }
-        function clearWorkspace() { document.getElementById('textInput').innerText = ""; committedText = ""; updateStudioStats(); }
+        function clearWorkspace() { document.getElementById('textInput').value = ""; committedText = ""; updateStudioStats(); }
+        
+        function setPreset(p) {
+            if (p === 'quote') document.getElementById('textInput').value = "The only way to do great work is to love what you do.";
+            if (p === 'gatsby') document.getElementById('textInput').value = "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since.";
+            updateStudioStats();
+        }
 
         async function generateAudio() {
-            const text = document.getElementById('textInput').innerText;
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) return;
             const btn = document.getElementById('genBtn');
-            btn.disabled = true; btn.innerText = "PROCESSING...";
+            const spinner = document.getElementById('genSpinner');
+            btn.disabled = true; spinner.classList.remove('hidden');
             try {
                 const res = await fetch('/synthesize', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text, voice: document.getElementById('voiceSelect').value, speed: parseFloat(document.getElementById('speedSlider').value)})
+                    body: JSON.stringify({text, voice: selectedVoiceId, speed: 1.0})
                 });
                 const blob = await res.blob();
                 document.getElementById('genAudio').src = URL.createObjectURL(blob);
                 document.getElementById('genAudio').play();
-            } finally { btn.disabled = false; btn.innerText = "GENERATE NEURAL MASTER"; }
+                showToast("Neural master generated", "success");
+            } catch (err) { showToast("Generation failed", "error"); }
+            finally { btn.disabled = false; spinner.classList.add('hidden'); }
         }
 
         // --- BOOK READER LOGIC ---
         let readerDoc = null;
         let currentPageNum = 0;
-        let isReading = false;
         let readerAudio = new Audio();
         let wordTimings = [];
-        let startTimestamp = 0;
-        let animationFrame = null;
-        let currentWordIdx = -1;
+        let isReading = false;
 
         async function handlePDFUpload(e) {
             const file = e.target.files[0];
-            if (!file) return;
             const formData = new FormData();
             formData.append('file', file);
-            
-            document.getElementById('text-panel').innerHTML = '<div style="text-align:center; margin-top:5rem;"><div class="spinner" style="display:inline-block; margin-bottom:1rem;"></div><br>Analyzing Neural Structure...</div>';
-            
+            document.getElementById('reader-text').innerHTML = '<div style="text-align:center; margin-top:5rem;"><div class="spinner" style="display:inline-block;"></div><br>Analyzing Neural Map...</div>';
             const res = await fetch('/upload-pdf', { method: 'POST', body: formData });
             readerDoc = await res.json();
-            currentPageNum = 0;
-            loadPage(0);
+            loadReaderPage(0);
         }
 
-        async function loadPage(num) {
-            if (!readerDoc) return;
+        async function loadReaderPage(num) {
             currentPageNum = num;
-            document.getElementById('page-info').innerText = `Page ${num + 1} of ${readerDoc.total_pages}`;
-            
-            // Load Image
+            document.getElementById('reader-page-info').innerText = `Page ${num+1} of ${readerDoc.total_pages}`;
             document.getElementById('pdfImage').src = `/pdf-page-image/${num}`;
-            
-            // Load Text & Words
             const res = await fetch(`/pdf-page-data/${num}`);
             const data = await res.json();
             
-            // Render Text Panel
-            const textPanel = document.getElementById('text-panel');
+            const textPanel = document.getElementById('reader-text');
             textPanel.innerHTML = '';
             data.words.forEach(w => {
-                const span = document.createElement('span');
-                span.className = 'reader-word';
-                span.id = `word-${w.word_index}`;
-                span.innerText = w.text + ' ';
-                span.onclick = () => startReadingFrom(w.word_index);
-                textPanel.appendChild(span);
+                const s = document.createElement('span');
+                s.className = 'reader-word';
+                s.id = `rw-${w.word_index}`;
+                s.innerText = w.text + ' ';
+                s.onclick = () => startReaderAt(w.word_index);
+                textPanel.appendChild(s);
             });
-
-            // Render PDF Overlay
-            const overlay = document.getElementById('pdf-overlay');
-            overlay.innerHTML = '';
-            const img = document.getElementById('pdfImage');
             
-            // Wait for image to load to get dimensions for scaling
+            const img = document.getElementById('pdfImage');
             img.onload = () => {
-                const scaleX = img.clientWidth / data.width;
-                const scaleY = img.clientHeight / data.height;
-                
+                const sx = img.clientWidth / data.width;
+                const sy = img.clientHeight / data.height;
+                const overlay = document.getElementById('pdf-overlay');
+                overlay.innerHTML = '';
                 data.words.forEach(w => {
-                    const div = document.createElement('div');
-                    div.className = 'pdf-word';
-                    div.id = `pdf-word-${w.word_index}`;
-                    div.style.left = (w.x0 * scaleX) + 'px';
-                    div.style.top = (w.y0 * scaleY) + 'px';
-                    div.style.width = ((w.x1 - w.x0) * scaleX) + 'px';
-                    div.style.height = ((w.y1 - w.y0) * scaleY) + 'px';
-                    div.onclick = () => startReadingFrom(w.word_index);
-                    overlay.appendChild(div);
+                    const d = document.createElement('div');
+                    d.style.position = 'absolute';
+                    d.className = 'pdf-word-highlight';
+                    d.id = `pw-${w.word_index}`;
+                    d.style.left = (w.x0 * sx) + 'px';
+                    d.style.top = (w.y0 * sy) + 'px';
+                    d.style.width = ((w.x1-w.x0)*sx) + 'px';
+                    d.style.height = ((w.y1-w.y0)*sy) + 'px';
+                    overlay.appendChild(d);
                 });
             };
-            if (img.complete) img.onload();
         }
 
-        function changePage(delta) {
-            if (!readerDoc) return;
-            let next = currentPageNum + delta;
-            if (next >= 0 && next < readerDoc.total_pages) {
-                stopReader();
-                loadPage(next);
-            }
+        function changePage(d) {
+            let next = currentPageNum + d;
+            if (next >=0 && next < readerDoc.total_pages) loadReaderPage(next);
         }
 
-        function toggleReaderPlay() {
-            if (!readerDoc) return;
-            if (isReading) pauseReader();
-            else startReadingFrom(currentWordIdx < 0 ? 0 : currentWordIdx);
-        }
-
-        async function startReadingFrom(idx) {
-            stopReader();
-            currentWordIdx = idx;
+        async function startReaderAt(idx) {
             isReading = true;
-            updatePlayBtn(true);
-
-            // Establish WebSocket for timing + audio
+            updateReaderUI(true);
             const ws = new WebSocket(`ws://${location.host}/ws/book-reader`);
-            ws.onopen = () => {
-                ws.send(JSON.stringify({
-                    page_num: currentPageNum,
-                    voice: document.getElementById('readerVoiceSelect').value,
-                    speed: 1.0,
-                    start_word: idx
-                }));
-            };
-
-            const audioQueue = [];
-            let isPlaying = false;
-
+            ws.onopen = () => ws.send(JSON.stringify({page_num: currentPageNum, voice: selectedVoiceId, start_word: idx}));
             ws.onmessage = async (e) => {
-                const data = JSON.parse(e.data);
-                if (data.type === 'timing') {
-                    wordTimings = wordTimings.concat(data.data);
-                } else if (data.type === 'audio') {
-                    const blob = await (await fetch(`data:audio/wav;base64,${data.data}`)).blob();
-                    audioQueue.push(URL.createObjectURL(blob));
-                    if (!isPlaying) playNextInQueue();
-                } else if (data.type === 'done') {
-                    // All chunks received
+                const d = JSON.parse(e.data);
+                if (d.type === 'timing') wordTimings = wordTimings.concat(d.data);
+                else if (d.type === 'audio') {
+                    const blob = await (await fetch(`data:audio/wav;base64,${d.data}`)).blob();
+                    readerAudio.src = URL.createObjectURL(blob);
+                    readerAudio.play();
+                    requestAnimationFrame(readerLoop);
                 }
             };
-
-            function playNextInQueue() {
-                if (audioQueue.length === 0) { isPlaying = false; return; }
-                isPlaying = true;
-                readerAudio.src = audioQueue.shift();
-                readerAudio.play();
-                startTimestamp = Date.now();
-                requestAnimationFrame(highlightLoop);
-                
-                readerAudio.onended = () => {
-                    // Update global timing offset if needed
-                    // For simplicity, we assume continuous timing from backend
-                    playNextInQueue();
-                };
-            }
         }
 
-        function highlightLoop() {
+        function readerLoop() {
             if (!isReading || readerAudio.paused) return;
-            const elapsed = readerAudio.currentTime;
-            
-            const word = wordTimings.find(w => elapsed >= w.start_time && elapsed < w.end_time);
-            if (word) {
-                // Highlight text panel
-                document.querySelectorAll('.word-current').forEach(el => el.classList.remove('word-current'));
-                const span = document.getElementById(`word-${word.word_index}`);
-                if (span) {
-                    span.classList.add('word-current');
-                    span.scrollIntoView({behavior:'smooth', block:'center'});
-                }
-                // Highlight PDF overlay
-                const pdfSpan = document.getElementById(`pdf-word-${word.word_index}`);
-                if (pdfSpan) pdfSpan.classList.add('word-current');
-                
-                // Mark as read
-                for(let i=0; i<word.word_index; i++) {
-                    const prev = document.getElementById(`word-${i}`);
-                    if (prev) prev.classList.add('word-read');
-                }
-                
-                // Progress
-                const progress = (word.word_index / readerDoc.pages[currentPageNum].word_count) * 100;
-                document.getElementById('read-progress').style.width = progress + '%';
+            const t = readerAudio.currentTime;
+            const w = wordTimings.find(wt => t >= wt.start_time && t < wt.end_time);
+            if (w) {
+                document.querySelectorAll('.reader-word.current').forEach(el => el.classList.remove('current'));
+                const s = document.getElementById(`rw-${w.word_index}`);
+                if (s) { s.classList.add('current'); s.scrollIntoView({behavior:'smooth', block:'center'}); }
             }
-            requestAnimationFrame(highlightLoop);
+            requestAnimationFrame(readerLoop);
         }
 
-        function pauseReader() {
-            isReading = false;
-            readerAudio.pause();
-            updatePlayBtn(false);
-            cancelAnimationFrame(animationFrame);
+        function toggleReaderPlay() { if(isReading) { readerAudio.pause(); isReading=false; updateReaderUI(false); } else startReaderAt(0); }
+        function updateReaderUI(active) {
+            document.getElementById('r-play').classList.toggle('hidden', active);
+            document.getElementById('r-pause').classList.toggle('hidden', !active);
         }
 
-        function stopReader() {
-            pauseReader();
-            readerAudio.src = "";
-            wordTimings = [];
-            currentWordIdx = -1;
-            document.querySelectorAll('.word-current, .word-read').forEach(el => el.classList.remove('word-current', 'word-read'));
-            document.getElementById('read-progress').style.width = '0%';
+        // --- VOICE LAB ---
+        function renderVoiceLab() {
+            const grid = document.getElementById('lab-grid');
+            grid.innerHTML = '';
+            for (const lang in allVoices) {
+                allVoices[lang].forEach(v => {
+                    const card = document.createElement('div');
+                    card.className = 'lab-card';
+                    card.innerHTML = `
+                        <div class="lab-card-header">
+                            <div>
+                                <div style="font-weight: 800;">${v.name}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">${lang} | ${v.gender}</div>
+                            </div>
+                            <div style="color: #fbbf24; font-weight: 800;">${v.quality}</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="lab-btn" onclick="previewVoice('${v.id}', '${v.name}')">Preview</button>
+                            <button class="lab-btn" onclick="testVoice('${v.id}')">Health Check</button>
+                        </div>
+                        <div id="status-${v.id}" style="margin-top: 0.75rem; font-size: 0.75rem;">Status: Awaiting...</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
         }
 
-        function updatePlayBtn(active) {
-            document.getElementById('play-icon').classList.toggle('hidden', active);
-            document.getElementById('pause-icon').classList.toggle('hidden', !active);
+        async function previewVoice(id, name) {
+            const res = await fetch('/synthesize', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: `Hello, this is ${name} speaking.`, voice: id})
+            });
+            const blob = await res.blob();
+            const a = new Audio(URL.createObjectURL(blob));
+            a.play();
         }
 
+        async function testVoice(id) {
+            const res = await fetch(`/voices/test/${id}`);
+            const data = await res.json();
+            const el = document.getElementById(`status-${id}`);
+            if (data.works) { el.innerText = "Status: Working ✓"; el.style.color = 'var(--success)'; }
+            else { el.innerText = "Status: Error ✗"; el.style.color = 'var(--error)'; }
+        }
+
+        window.onload = () => { loadVoices(); switchTab('studio'); };
     </script>
 </body>
 </html>
