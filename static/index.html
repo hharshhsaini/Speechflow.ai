@@ -766,22 +766,54 @@
         }
 
         async function previewVoice(id, name) {
-            const res = await fetch('/synthesize', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({text: `Hello, this is ${name} speaking.`, voice: id})
-            });
-            const blob = await res.blob();
-            const a = new Audio(URL.createObjectURL(blob));
-            a.play();
+            showToast(`Generating preview for ${name}...`, "info");
+            try {
+                const res = await fetch('/synthesize', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: `Hello, this is ${name} speaking.`, voice: id, speed: 1.0})
+                });
+                if (!res.ok) throw new Error("Synthesis failed");
+                const blob = await res.blob();
+                const a = new Audio(URL.createObjectURL(blob));
+                a.play();
+            } catch (err) {
+                showToast(`Failed to preview ${name}`, "error");
+            }
         }
 
         async function testVoice(id) {
-            const res = await fetch(`/voices/test/${id}`);
-            const data = await res.json();
             const el = document.getElementById(`status-${id}`);
-            if (data.works) { el.innerText = "Status: Working ✓"; el.style.color = 'var(--success)'; }
-            else { el.innerText = "Status: Error ✗"; el.style.color = 'var(--error)'; }
+            el.innerText = "Status: Testing...";
+            try {
+                const res = await fetch(`/voices/test/${id}`);
+                const data = await res.json();
+                if (data.works) { 
+                    el.innerText = "Status: Working ✓"; 
+                    el.style.color = 'var(--success)'; 
+                } else { 
+                    el.innerText = "Status: Error ✗"; 
+                    el.style.color = 'var(--error)'; 
+                }
+            } catch (err) {
+                el.innerText = "Status: Connection Error";
+                el.style.color = 'var(--error)';
+            }
+        }
+
+        async function testAllVoices() {
+            showToast("Starting mass voice audit...", "info");
+            const voiceIds = [];
+            for (const lang in allVoices) {
+                allVoices[lang].forEach(v => voiceIds.push(v.id));
+            }
+            
+            for (const id of voiceIds) {
+                await testVoice(id);
+                // Small delay to avoid hammering the local engine too hard
+                await new Promise(r => setTimeout(r, 100));
+            }
+            showToast("Voice audit complete", "success");
         }
 
         window.onload = () => { loadVoices(); switchTab('studio'); };
