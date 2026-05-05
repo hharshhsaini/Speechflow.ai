@@ -485,8 +485,28 @@
         let currentTab = 'studio';
 
         // --- CORE NAVIGATION ---
+        let isAuditRunning = false;
+
         function switchTab(t) {
             console.log('Switching to tab:', t);
+            
+            // Stop any running audits
+            isAuditRunning = false;
+            
+            // Stop all audio
+            document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+            if (readerAudio) { readerAudio.pause(); }
+            
+            // If leaving reader, we don't necessarily stop it (could be background), 
+            // but the user wants it to stop.
+            if (currentTab === 'reader' && t !== 'reader') {
+                 // Don't call stopReader() fully to allow resuming? 
+                 // No, user said "sound should stop".
+                 readerAudio.pause();
+                 isReading = false;
+                 updateReaderUI(false);
+            }
+
             currentTab = t;
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             const targetTab = document.getElementById(`tab-${t}`);
@@ -744,7 +764,7 @@
                 } else if (d.type === 'audio') {
                     const blob = await (await fetch(`data:audio/wav;base64,${d.data}`)).blob();
                     audioQueue.push(URL.createObjectURL(blob));
-                    if (!isPlayingChunk) playNextChunk();
+                    if (!isPlayingChunk && isReading) playNextChunk();
                 }
             };
 
@@ -757,10 +777,11 @@
                 const src = audioQueue.shift();
                 readerAudio.src = src;
                 
-                // Wait for metadata to get duration for the offset
                 readerAudio.onloadedmetadata = () => {
-                    readerAudio.play();
-                    requestAnimationFrame(readerLoop);
+                    if (isReading) {
+                        readerAudio.play();
+                        requestAnimationFrame(readerLoop);
+                    }
                 };
 
                 readerAudio.onended = () => {
@@ -773,30 +794,45 @@
         function readerLoop() {
             if (!isReading || readerAudio.paused) return;
             
+            // Precise sync: use audio context time or just currentTime
             const totalElapsed = chunkDurationOffset + readerAudio.currentTime;
-            const word = wordTimings.find(wt => totalElapsed >= wt.start_time && totalElapsed < wt.end_time);
+            
+            // Find word with binary search or just find (array is small)
+            const word = wordTimings.find(wt => totalElapsed >= wt.start_time && totalElapsed <= wt.end_time);
             
             if (word) {
-                // Highlight text panel
-                document.querySelectorAll('.reader-word.current').forEach(el => el.classList.remove('current'));
                 const s = document.getElementById(`rw-${word.word_index}`);
-                if (s) { 
+                if (s && !s.classList.contains('current')) {
+                    document.querySelectorAll('.reader-word.current').forEach(el => el.classList.remove('current'));
                     s.classList.add('current'); 
                     s.scrollIntoView({behavior:'smooth', block:'center'}); 
                 }
-                // Highlight PDF overlay
-                document.querySelectorAll('.pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
                 const ps = document.getElementById(`pw-${word.word_index}`);
-                if (ps) ps.classList.add('current');
+                if (ps && !ps.classList.contains('current')) {
+                    document.querySelectorAll('.pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
+                    ps.classList.add('current');
+                }
             }
             requestAnimationFrame(readerLoop);
         }
 
         function toggleReaderPlay() { 
-            if(isReading) { 
-                stopReader(); 
+            if (isReading) { 
+                // Pause logic
+                isReading = false;
+                readerAudio.pause();
+                updateReaderUI(false);
             } else { 
-                startReaderAt(0); 
+                if (audioQueue.length > 0 || readerAudio.src) {
+                    // Resume logic
+                    isReading = true;
+                    readerAudio.play();
+                    updateReaderUI(true);
+                    requestAnimationFrame(readerLoop);
+                } else {
+                    // Start from beginning or current selection
+                    startReaderAt(0); 
+                }
             } 
         }
 
@@ -881,7 +917,10 @@
         }
 
         async function testAllVoices() {
-            showToast("Starting mass voice audit with audio previews...", "info");
+            if (isAuditRunning) { isAuditRunning = false; return; }
+            isAuditRunning = true;
+            showToast("Starting mass voice audit...", "info");
+            
             const voiceIds = [];
             const voiceNames = [];
             for (const lang in allVoices) {
@@ -892,18 +931,16 @@
             }
             
             for (let i = 0; i < voiceIds.length; i++) {
+                if (!isAuditRunning) break;
                 const id = voiceIds[i];
                 const name = voiceNames[i];
                 
-                // Trigger Health Check (Visual)
                 await testVoice(id);
-                
-                // Trigger Audio Preview
                 await previewVoice(id, name);
                 
-                // Wait for audio snippet (approx 2.5s) before next one
                 await new Promise(r => setTimeout(r, 2500));
             }
+            isAuditRunning = false;
             showToast("Mass audio audit complete", "success");
         }
 
