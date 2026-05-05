@@ -39,347 +39,175 @@
             justify-content: center;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 3rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-        }
+        .container { width: 100%; max-width: 1400px; padding: 2rem; display: flex; flex-direction: column; gap: 2rem; }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-        }
-
-        .brand h1 { margin: 0; font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .brand h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; }
         .brand h1 span { color: var(--primary); }
-        .brand p { margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 1.1rem; font-weight: 300; }
+        .brand p { margin: 0.2rem 0 0 0; color: var(--text-muted); font-size: 1rem; font-weight: 300; }
 
-        .hardware-badge {
-            background: var(--surface-lighter);
-            padding: 0.5rem 1rem;
-            border-radius: 99px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .hardware-badge { background: var(--surface-lighter); padding: 0.4rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 2rem;
-        }
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
+        .nav-tab { padding: 0.75rem 1.5rem; border-radius: 1rem 1rem 0 0; cursor: pointer; font-weight: 700; color: var(--text-muted); border-bottom: 3px solid transparent; }
+        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--surface-lighter); }
 
-        @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+        .panel { background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; }
 
-        .panel {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            position: relative;
-        }
-
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: -0.5rem;
-        }
-
-        .panel-header h2 { margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 600; }
-
-        /* Workspace Styling */
-        .workspace-container {
-            position: relative;
-            background: #000;
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        #textInput {
-            width: 100%;
-            height: 300px;
-            color: #fff;
-            padding: 1.25rem;
-            font-family: inherit;
-            font-size: 1.25rem;
-            line-height: 1.6;
-            outline: none;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .workspace-container:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
-
+        /* STUDIO TAB */
+        .studio-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; }
+        .workspace-container { position: relative; background: #000; border: 1px solid var(--border); border-radius: 1rem; overflow: hidden; }
+        #textInput { width: 100%; height: 350px; color: #fff; padding: 1.25rem; font-size: 1.25rem; line-height: 1.6; outline: none; overflow-y: auto; white-space: pre-wrap; }
         .interim { color: var(--text-muted); font-style: italic; }
+        .clear-btn { position: absolute; top: 0.75rem; right: 0.75rem; background: var(--surface-lighter); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.7rem; padding: 0.3rem 0.6rem; border-radius: 0.5rem; cursor: pointer; z-index: 5; }
 
-        .clear-btn {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            background: var(--surface-lighter);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.7rem;
-            padding: 0.3rem 0.6rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: 700;
-            z-index: 5;
-        }
-        .clear-btn:hover { background: var(--border); color: #fff; }
-
-        .stats-row {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: -0.75rem;
-            font-weight: 600;
-        }
-
-        /* Mic Controls */
-        .mic-section {
-            position: absolute;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 10;
-        }
-
-        .mic-label {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0;
-            transform: translateY(5px);
-            transition: all 0.3s ease;
-        }
-        .mic-label.visible { opacity: 1; transform: translateY(0); }
-
-        .mic-btn {
-            width: 4.5rem;
-            height: 4.5rem;
-            border-radius: 50%;
-            background: var(--primary);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.5);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .mic-btn:hover { transform: scale(1.05); }
-
-        .mic-btn.active { 
-            background: var(--primary); 
-            animation: ring-pulse 1.5s infinite;
-        }
+        /* BOOK READER TAB */
+        .reader-container { display: flex; gap: 1.5rem; height: calc(100vh - 250px); min-height: 600px; }
         
-        @keyframes ring-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(249, 115, 22, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
-        }
+        .pdf-panel { flex: 4; background: #000; border-radius: 1rem; position: relative; overflow: auto; display: flex; justify-content: center; border: 1px solid var(--border); }
+        .pdf-viewport { position: relative; width: fit-content; height: fit-content; }
+        #pdfImage { display: block; max-width: 100%; height: auto; pointer-events: none; }
+        .pdf-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .pdf-word { position: absolute; background: transparent; pointer-events: auto; cursor: pointer; }
+        .pdf-word.word-current { background: rgba(249, 115, 22, 0.4); border-radius: 2px; }
 
-        .mic-btn.processing { 
-            background: var(--surface-lighter); 
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        .text-panel { flex: 6; background: var(--surface); border-radius: 1rem; padding: 2rem; overflow-y: auto; border: 1px solid var(--border); line-height: 2; font-size: 1.3rem; position: relative; }
+        .reader-word { cursor: pointer; border-radius: 3px; padding: 0 2px; }
+        .reader-word:hover { background: var(--surface-lighter); }
+        .word-current { background: var(--primary) !important; color: #000; font-weight: 700; box-shadow: 0 4px 12px var(--primary-glow); }
+        .word-read { background: rgba(99, 102, 241, 0.15); color: var(--text-muted); }
 
-        .mic-btn svg { width: 2rem; height: 2rem; fill: white; }
+        .reader-controls { display: flex; align-items: center; gap: 1.5rem; background: var(--surface-lighter); padding: 1rem 2rem; border-radius: 1rem; border: 1px solid var(--border); }
+        .reader-btn-large { width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .reader-btn-small { background: var(--surface); border: 1px solid var(--border); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.9rem; }
 
-        /* Pulsing Waveform */
-        .waveform {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            height: 30px;
-            margin-right: 1rem;
-            display: none;
-        }
-        .waveform.active { display: flex; }
-        .wave-bar { width: 4px; background: var(--primary); border-radius: 10px; height: 10px; }
-        .wave-bar:nth-child(1) { animation: wave 0.8s ease-in-out infinite; }
-        .wave-bar:nth-child(2) { animation: wave 0.8s ease-in-out infinite 0.1s; }
-        .wave-bar:nth-child(3) { animation: wave 0.8s ease-in-out infinite 0.2s; }
-        .wave-bar:nth-child(4) { animation: wave 0.8s ease-in-out infinite 0.3s; }
-        .wave-bar:nth-child(5) { animation: wave 0.8s ease-in-out infinite 0.4s; }
-
-        @keyframes wave {
-            0%, 100% { height: 8px; }
-            50% { height: 28px; }
-        }
-
-        /* Standard Controls */
-        .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .control-group label { display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-
-        select { width: 100%; background: var(--surface-lighter); border: 1px solid var(--border); color: white; padding: 1rem; border-radius: 0.75rem; outline: none; font-family: inherit; }
-
-        .slider-wrap { display: flex; align-items: center; gap: 1rem; background: var(--surface-lighter); padding: 0.6rem 1.2rem; border-radius: 0.75rem; border: 1px solid var(--border); }
-        input[type="range"] { flex: 1; accent-color: var(--primary); }
-        .val-display { font-family: 'JetBrains Mono', monospace; color: var(--primary); font-weight: 700; width: 3.5rem; text-align: right; }
-
-        .btn-ghost { background: var(--surface-lighter); border: 1px solid var(--border); color: var(--text); padding: 0.7rem 1.4rem; border-radius: 0.75rem; font-size: 0.9rem; cursor: pointer; font-weight: 600; }
-        .btn-ghost:hover { background: var(--border); }
-
-        .tabs { display: flex; gap: 0.5rem; background: var(--surface-lighter); padding: 0.4rem; border-radius: 1.25rem; }
-        .tab { flex: 1; padding: 0.85rem; text-align: center; font-size: 0.95rem; font-weight: 700; cursor: pointer; border-radius: 0.85rem; color: var(--text-muted); }
-        .tab.active { background: var(--surface); color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-
-        .btn-action { width: 100%; padding: 1.75rem; border-radius: 1.5rem; border: none; font-family: inherit; font-weight: 800; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 1.25rem; box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5); }
-        .btn-generate { background: var(--primary); color: white; }
-        .btn-generate:hover { transform: translateY(-4px); box-shadow: 0 25px 50px -15px var(--primary-glow); }
-
-        .audio-preview { background: #000; border-radius: 1.5rem; padding: 2.25rem; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1.5rem; }
-        audio { width: 100%; filter: invert(1); height: 45px; }
-
-        .tokens-area { background: #000; border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--primary); min-height: 140px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; }
-
-        .hidden { display: none; }
-        .spinner { width: 1.5rem; height: 1.5rem; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* Common Components */
+        .hidden { display: none !important; }
+        .mic-btn { width: 4rem; height: 4rem; border-radius: 50%; background: var(--primary); border: none; cursor: pointer; position: absolute; bottom: 1.5rem; right: 1.5rem; display: flex; align-items: center; justify-content: center; }
+        .mic-btn.active { animation: ring-pulse 1.5s infinite; }
+        @keyframes ring-pulse { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(249, 115, 22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); } }
+        
+        .spinner { width: 1.2rem; height: 1.2rem; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #fallback-banner {
-            background: var(--accent-error);
-            color: white;
-            padding: 0.5rem;
-            text-align: center;
-            font-size: 0.8rem;
-            font-weight: 700;
-            display: none;
-        }
+        .waveform { display: none; align-items: center; gap: 3px; height: 20px; }
+        .waveform.active { display: flex; }
+        .wave-bar { width: 3px; background: var(--primary); height: 8px; border-radius: 2px; }
+        .wave-bar:nth-child(1) { animation: wave 0.8s infinite; }
+        .wave-bar:nth-child(2) { animation: wave 0.8s infinite 0.1s; }
+        .wave-bar:nth-child(3) { animation: wave 0.8s infinite 0.2s; }
+        @keyframes wave { 0%, 100% { height: 6px; } 50% { height: 18px; } }
+
+        .progress-bar { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.1s linear; }
+
+        #upload-zone { border: 2px dashed var(--border); border-radius: 1rem; padding: 4rem; text-align: center; cursor: pointer; width: 100%; }
+        #upload-zone:hover { border-color: var(--primary); background: rgba(249, 115, 22, 0.05); }
 
     </style>
 </head>
 <body>
 
-    <div id="fallback-banner">Use Chrome/Edge for live dictation. Recording mode active.</div>
-
     <div class="container">
         <header>
             <div class="brand">
                 <h1>SpeechFlow<span>.ai</span></h1>
-                <p>Pro Neural Studio | Real-time Multimodal Engine</p>
+                <p>Advanced Neural Studio | Pro Suite</p>
             </div>
             <div class="hardware-badge">
-                <span id="hw-status" style="color: var(--accent-success)">●</span> Local AI Engine
+                <span id="hw-status" style="color: var(--accent-success)">●</span> Local AI Engine Ready
             </div>
         </header>
 
-        <div class="main-grid">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>Workspace</h2>
-                    <div id="stt-visuals" class="waveform">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
+        <div class="nav-tabs">
+            <div id="tab-btn-studio" class="nav-tab active" onclick="switchTab('studio')">Studio Workspace</div>
+            <div id="tab-btn-reader" class="nav-tab" onclick="switchTab('reader')">Book Reader</div>
+        </div>
+
+        <!-- STUDIO WORKSPACE -->
+        <div id="view-studio" class="tab-view">
+            <div class="studio-grid">
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Workspace</h2>
+                        <div id="mic-viz" class="waveform"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
                     </div>
-                </div>
-                
-                <div class="workspace-container">
-                    <button class="clear-btn" onclick="clearText()">Clear</button>
-                    <div id="textInput" contenteditable="true" placeholder="Speak or type here..."></div>
-                    
-                    <div class="mic-section">
-                        <div id="micLabel" class="mic-label">Listening...</div>
-                        <button id="micBtn" class="mic-btn" onclick="toggleSTT()" title="Live Transcription">
-                            <div id="micSpinner" class="spinner hidden"></div>
-                            <div id="micIcon">
-                                <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
-                            </div>
-                            <div id="stopIcon" class="hidden">
-                                <rect x="6" y="6" width="12" height="12" fill="white" />
-                            </div>
+                    <div class="workspace-container">
+                        <button class="clear-btn" onclick="clearWorkspace()">CLEAR</button>
+                        <div id="textInput" contenteditable="true" placeholder="Start typing or use the mic..."></div>
+                        <button id="micBtn" class="mic-btn" onclick="toggleSTT()">
+                            <svg id="mic-svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                            <rect id="stop-svg" class="hidden" x="7" y="7" width="10" height="10" fill="white" />
                         </button>
                     </div>
-                </div>
-
-                <div class="stats-row">
-                    <span id="wordCount">0 words</span>
-                    <span id="charCount">0 characters</span>
-                </div>
-
-                <div class="controls-row">
-                    <div class="control-group">
-                        <label>Speaker Profile</label>
-                        <select id="voiceSelect"></select>
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; font-size: 0.7rem; color: var(--text-muted);">
+                        <span id="studio-word-count">0 words</span> | <span id="studio-char-count">0 chars</span>
                     </div>
-                    <div class="control-group">
-                        <label>Speed Tuning</label>
-                        <div class="slider-wrap">
-                            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0">
-                            <span id="speedVal" class="val-display">1.0x</span>
+                    <div class="studio-controls" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.7rem; margin-bottom: 0.5rem; color: var(--text-muted);">VOICE PROFILE</label>
+                            <select id="voiceSelect" style="width: 100%; background: var(--surface-lighter); color: white; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--border);"></select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.7rem; margin-bottom: 0.5rem; color: var(--text-muted);">SPEED</label>
+                            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
                         </div>
                     </div>
+                    <button id="genBtn" class="btn-action" style="background: var(--primary); color: white; padding: 1rem; border-radius: 1rem; font-weight: 700; border: none; cursor: pointer;" onclick="generateAudio()">GENERATE NEURAL MASTER</button>
+                    <audio id="genAudio" controls style="width: 100%; filter: invert(1); height: 40px;"></audio>
                 </div>
-
-                <div class="control-group">
-                    <label>Presets</label>
-                    <div class="presets">
-                        <button class="btn-ghost" onclick="fetchPreset('/random-quote')">Quote</button>
-                        <button class="btn-ghost" onclick="fetchPreset('/gatsby')">Gatsby</button>
-                    </div>
+                <div class="panel">
+                    <h2 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Neural Tokens</h2>
+                    <div id="tokensOutput" style="background: #000; padding: 1rem; border-radius: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--primary); min-height: 200px; white-space: pre-wrap;">Tokens will appear here...</div>
                 </div>
             </div>
+        </div>
 
-            <div class="panel">
-                <div class="tabs">
-                    <div id="tab-gen" class="tab active" onclick="switchMode('gen')">Studio Master</div>
-                    <div id="tab-stream" class="tab" onclick="switchMode('stream')">Live Stream</div>
-                </div>
+        <!-- BOOK READER -->
+        <div id="view-reader" class="tab-view hidden">
+            <div class="panel" style="gap: 1rem;">
+                <div class="reader-controls">
+                    <button class="reader-btn-small" onclick="document.getElementById('pdf-upload').click()">Upload PDF</button>
+                    <input type="file" id="pdf-upload" class="hidden" accept=".pdf" onchange="handlePDFUpload(event)">
+                    
+                    <select id="readerVoiceSelect" style="background: var(--surface); color: white; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border);"></select>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button class="reader-btn-small" onclick="changePage(-1)">PREV</button>
+                        <span id="page-info" style="font-size: 0.8rem; font-weight: 700;">Page 0 of 0</span>
+                        <button class="reader-btn-small" onclick="changePage(1)">NEXT</button>
+                    </div>
 
-                <div class="output-actions">
-                    <div id="mode-gen">
-                        <button id="genBtn" class="btn-action btn-generate" onclick="generateAudio()">
-                            <div id="genSpinner" class="spinner hidden"></div>
-                            <span id="genText">Generate Master</span>
+                    <div style="flex: 1; display: flex; justify-content: center; gap: 1rem;">
+                        <button id="readerPlayBtn" class="reader-btn-large" onclick="toggleReaderPlay()">
+                            <svg id="play-icon" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="pause-icon" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
+                        <button class="reader-btn-large" style="background: var(--surface-lighter);" onclick="stopReader()">
+                            <rect x="7" y="7" width="10" height="10" fill="white" />
                         </button>
                     </div>
 
-                    <div id="mode-stream" class="hidden">
-                        <div class="controls-row" style="grid-template-columns: 2fr 1fr">
-                            <button id="streamBtn" class="btn-action btn-stream" onclick="startStream()">Start Stream</button>
-                            <button class="btn-action btn-ghost" style="background: var(--accent-error); border: none" onclick="stopStream()">Stop</button>
+                    <div class="progress-bar"><div id="read-progress" class="progress-fill"></div></div>
+                </div>
+
+                <div id="upload-prompt" class="hidden">
+                    <div id="upload-zone" onclick="document.getElementById('pdf-upload').click()">
+                        <h3 style="margin-bottom: 0.5rem;">Ready to Read?</h3>
+                        <p style="color: var(--text-muted);">Drop a PDF here or click to browse</p>
+                    </div>
+                </div>
+
+                <div id="reader-workspace" class="reader-container">
+                    <div class="pdf-panel">
+                        <div id="pdf-viewport" class="pdf-viewport">
+                            <img id="pdfImage" src="" alt="PDF Page">
+                            <div id="pdf-overlay" class="pdf-overlay"></div>
                         </div>
                     </div>
-
-                    <div class="audio-preview">
-                        <audio id="genAudio" controls></audio>
-                    </div>
-
-                    <div class="control-group">
-                        <label>Neural Tokens</label>
-                        <div id="tokensOutput" class="tokens-area">Tokens pending...</div>
+                    <div id="text-panel" class="text-panel">
+                        <div style="text-align: center; color: var(--text-muted); margin-top: 5rem;">Upload a PDF to start your session</div>
                     </div>
                 </div>
             </div>
@@ -387,194 +215,298 @@
     </div>
 
     <script>
-        const voiceSelect = document.getElementById('voiceSelect');
-        const textInput = document.getElementById('textInput');
-        const speedSlider = document.getElementById('speedSlider');
-        const speedVal = document.getElementById('speedVal');
-        const genAudio = document.getElementById('genAudio');
-        const genBtn = document.getElementById('genBtn');
-        const genSpinner = document.getElementById('genSpinner');
-        const tokensOutput = document.getElementById('tokensOutput');
-        const micBtn = document.getElementById('micBtn');
-        const micLabel = document.getElementById('micLabel');
-        const micIcon = document.getElementById('micIcon');
-        const stopIcon = document.getElementById('stopIcon');
-        const micSpinner = document.getElementById('micSpinner');
-        const waveform = document.getElementById('stt-visuals');
-        const wordCount = document.getElementById('wordCount');
-        const charCount = document.getElementById('charCount');
-
-        let isRecording = false;
-        let recognition = null;
-        let committedText = "";
-        let interimText = "";
-
-        window.onload = () => {
-            fetchVoices();
-            speedSlider.oninput = () => speedVal.textContent = speedSlider.value + 'x';
-            setupSTT();
-            textInput.addEventListener('input', updateStats);
-        };
-
-        function updateStats() {
-            const text = textInput.innerText.trim();
-            const words = text ? text.split(/\s+/).length : 0;
-            const chars = text.length;
-            wordCount.textContent = `${words} words`;
-            charCount.textContent = `${chars} characters`;
-        }
+        // --- COMMON LOGIC ---
+        const voiceSelects = [document.getElementById('voiceSelect'), document.getElementById('readerVoiceSelect')];
+        let currentTab = 'studio';
 
         async function fetchVoices() {
-            try {
-                const res = await fetch('/voices');
-                const groups = await res.json();
+            const res = await fetch('/voices');
+            const groups = await res.json();
+            voiceSelects.forEach(sel => {
+                sel.innerHTML = '';
                 for (const lang in groups) {
-                    const optgroup = document.createElement('optgroup');
-                    optgroup.label = lang;
+                    const group = document.createElement('optgroup');
+                    group.label = lang;
                     groups[lang].forEach(v => {
                         const opt = document.createElement('option');
-                        opt.value = v.id;
-                        opt.textContent = `${v.name} (${v.gender})`;
-                        optgroup.appendChild(opt);
+                        opt.value = v.id; opt.textContent = `${v.name} (${v.gender})`;
+                        group.appendChild(opt);
                     });
-                    voiceSelect.appendChild(optgroup);
+                    sel.appendChild(group);
                 }
-            } catch (err) {}
+            });
         }
 
-        async function fetchPreset(url) {
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                textInput.innerText = data.text;
-                committedText = data.text;
-                updateStats();
-            } catch (err) {}
+        function switchTab(t) {
+            currentTab = t;
+            document.getElementById('tab-btn-studio').classList.toggle('active', t === 'studio');
+            document.getElementById('tab-btn-reader').classList.toggle('active', t === 'reader');
+            document.getElementById('view-studio').classList.toggle('hidden', t !== 'studio');
+            document.getElementById('view-reader').classList.toggle('hidden', t !== 'reader');
         }
 
-        function clearText() { textInput.innerText = ''; committedText = ''; interimText = ''; updateStats(); }
+        window.onload = () => { fetchVoices(); switchTab('studio'); };
 
-        function switchMode(m) {
-            document.getElementById('tab-gen').classList.toggle('active', m === 'gen');
-            document.getElementById('tab-stream').classList.toggle('active', m === 'stream');
-            document.getElementById('mode-gen').classList.toggle('hidden', m !== 'gen');
-            document.getElementById('mode-stream').classList.toggle('hidden', m !== 'stream');
+        // --- STUDIO LOGIC ---
+        let recognition = null;
+        let isSTTActive = false;
+        let committedText = "";
+
+        function setupSTT() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true; recognition.interimResults = true;
+            recognition.onresult = (e) => {
+                let interim = "";
+                for (let i = e.resultIndex; i < e.results.length; ++i) {
+                    if (e.results[i].isFinal) {
+                        committedText += (committedText ? " " : "") + e.results[i][0].transcript;
+                        refineStudioText(e.results[i][0].transcript);
+                    } else { interim += e.results[i][0].transcript; }
+                }
+                document.getElementById('textInput').innerHTML = committedText + ` <span class="interim">${interim}</span>`;
+                updateStudioStats();
+            };
+            recognition.onstart = () => {
+                isSTTActive = true;
+                document.getElementById('micBtn').classList.add('active');
+                document.getElementById('mic-svg').classList.add('hidden');
+                document.getElementById('stop-svg').classList.remove('hidden');
+                document.getElementById('mic-viz').classList.add('active');
+            };
+            recognition.onend = () => {
+                isSTTActive = false;
+                document.getElementById('micBtn').classList.remove('active');
+                document.getElementById('mic-svg').classList.remove('hidden');
+                document.getElementById('stop-svg').classList.add('hidden');
+                document.getElementById('mic-viz').classList.remove('active');
+            };
         }
+
+        async function refineStudioText(t) {
+            const res = await fetch('/refine-transcript', { method: 'POST', body: JSON.stringify({text: t}) });
+            const data = await res.json();
+            if (data.changed) { committedText = committedText.replace(t, data.refined); renderStudioText(); }
+        }
+
+        function renderStudioText() { document.getElementById('textInput').innerText = committedText; updateStudioStats(); }
+        function updateStudioStats() {
+            const txt = document.getElementById('textInput').innerText;
+            document.getElementById('studio-word-count').innerText = `${txt ? txt.split(/\s+/).length : 0} words`;
+            document.getElementById('studio-char-count').innerText = `${txt.length} chars`;
+        }
+        function toggleSTT() {
+            if (!recognition) setupSTT();
+            if (!isSTTActive) { committedText = document.getElementById('textInput').innerText; recognition.start(); }
+            else recognition.stop();
+        }
+        function clearWorkspace() { document.getElementById('textInput').innerText = ""; committedText = ""; updateStudioStats(); }
 
         async function generateAudio() {
-            const text = textInput.innerText.trim();
-            if (!text) return;
-            genBtn.disabled = true;
-            genSpinner.classList.remove('hidden');
-
+            const text = document.getElementById('textInput').innerText;
+            const btn = document.getElementById('genBtn');
+            btn.disabled = true; btn.innerText = "PROCESSING...";
             try {
                 const res = await fetch('/synthesize', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, voice: voiceSelect.value, speed: parseFloat(speedSlider.value) })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text, voice: document.getElementById('voiceSelect').value, speed: parseFloat(document.getElementById('speedSlider').value)})
                 });
                 const blob = await res.blob();
-                genAudio.src = URL.createObjectURL(blob);
-                genAudio.play();
+                document.getElementById('genAudio').src = URL.createObjectURL(blob);
+                document.getElementById('genAudio').play();
+            } finally { btn.disabled = false; btn.innerText = "GENERATE NEURAL MASTER"; }
+        }
+
+        // --- BOOK READER LOGIC ---
+        let readerDoc = null;
+        let currentPageNum = 0;
+        let isReading = false;
+        let readerAudio = new Audio();
+        let wordTimings = [];
+        let startTimestamp = 0;
+        let animationFrame = null;
+        let currentWordIdx = -1;
+
+        async function handlePDFUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            document.getElementById('text-panel').innerHTML = '<div style="text-align:center; margin-top:5rem;"><div class="spinner" style="display:inline-block; margin-bottom:1rem;"></div><br>Analyzing Neural Structure...</div>';
+            
+            const res = await fetch('/upload-pdf', { method: 'POST', body: formData });
+            readerDoc = await res.json();
+            currentPageNum = 0;
+            loadPage(0);
+        }
+
+        async function loadPage(num) {
+            if (!readerDoc) return;
+            currentPageNum = num;
+            document.getElementById('page-info').innerText = `Page ${num + 1} of ${readerDoc.total_pages}`;
+            
+            // Load Image
+            document.getElementById('pdfImage').src = `/pdf-page-image/${num}`;
+            
+            // Load Text & Words
+            const res = await fetch(`/pdf-page-data/${num}`);
+            const data = await res.json();
+            
+            // Render Text Panel
+            const textPanel = document.getElementById('text-panel');
+            textPanel.innerHTML = '';
+            data.words.forEach(w => {
+                const span = document.createElement('span');
+                span.className = 'reader-word';
+                span.id = `word-${w.word_index}`;
+                span.innerText = w.text + ' ';
+                span.onclick = () => startReadingFrom(w.word_index);
+                textPanel.appendChild(span);
+            });
+
+            // Render PDF Overlay
+            const overlay = document.getElementById('pdf-overlay');
+            overlay.innerHTML = '';
+            const img = document.getElementById('pdfImage');
+            
+            // Wait for image to load to get dimensions for scaling
+            img.onload = () => {
+                const scaleX = img.clientWidth / data.width;
+                const scaleY = img.clientHeight / data.height;
                 
-                const tokRes = await fetch('/tokenize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, voice: voiceSelect.value })
+                data.words.forEach(w => {
+                    const div = document.createElement('div');
+                    div.className = 'pdf-word';
+                    div.id = `pdf-word-${w.word_index}`;
+                    div.style.left = (w.x0 * scaleX) + 'px';
+                    div.style.top = (w.y0 * scaleY) + 'px';
+                    div.style.width = ((w.x1 - w.x0) * scaleX) + 'px';
+                    div.style.height = ((w.y1 - w.y0) * scaleY) + 'px';
+                    div.onclick = () => startReadingFrom(w.word_index);
+                    overlay.appendChild(div);
                 });
-                const tokData = await tokRes.json();
-                tokensOutput.textContent = tokData.phonemes;
-            } catch (err) {} finally {
-                genBtn.disabled = false;
-                genSpinner.classList.add('hidden');
+            };
+            if (img.complete) img.onload();
+        }
+
+        function changePage(delta) {
+            if (!readerDoc) return;
+            let next = currentPageNum + delta;
+            if (next >= 0 && next < readerDoc.total_pages) {
+                stopReader();
+                loadPage(next);
             }
         }
 
-        // --- STT UPGRADE ---
-        function setupSTT() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                document.getElementById('fallback-banner').style.display = 'block';
-                return;
-            }
+        function toggleReaderPlay() {
+            if (!readerDoc) return;
+            if (isReading) pauseReader();
+            else startReadingFrom(currentWordIdx < 0 ? 0 : currentWordIdx);
+        }
 
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
+        async function startReadingFrom(idx) {
+            stopReader();
+            currentWordIdx = idx;
+            isReading = true;
+            updatePlayBtn(true);
 
-            recognition.onresult = async (event) => {
-                let interim = "";
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        const finalText = event.results[i][0].transcript;
-                        committedText += (committedText ? " " : "") + finalText;
-                        refineText(finalText);
-                    } else {
-                        interim += event.results[i][0].transcript;
-                    }
+            // Establish WebSocket for timing + audio
+            const ws = new WebSocket(`ws://${location.host}/ws/book-reader`);
+            ws.onopen = () => {
+                ws.send(JSON.stringify({
+                    page_num: currentPageNum,
+                    voice: document.getElementById('readerVoiceSelect').value,
+                    speed: 1.0,
+                    start_word: idx
+                }));
+            };
+
+            const audioQueue = [];
+            let isPlaying = false;
+
+            ws.onmessage = async (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'timing') {
+                    wordTimings = wordTimings.concat(data.data);
+                } else if (data.type === 'audio') {
+                    const blob = await (await fetch(`data:audio/wav;base64,${data.data}`)).blob();
+                    audioQueue.push(URL.createObjectURL(blob));
+                    if (!isPlaying) playNextInQueue();
+                } else if (data.type === 'done') {
+                    // All chunks received
                 }
-                interimText = interim;
-                renderText();
             };
 
-            recognition.onstart = () => {
-                isRecording = true;
-                micBtn.classList.add('active');
-                micLabel.classList.add('visible');
-                micIcon.classList.add('hidden');
-                stopIcon.classList.remove('hidden');
-                waveform.classList.add('active');
-            };
-
-            recognition.onend = () => {
-                isRecording = false;
-                micBtn.classList.remove('active');
-                micLabel.classList.remove('visible');
-                micIcon.classList.remove('hidden');
-                stopIcon.classList.add('hidden');
-                waveform.classList.remove('active');
-            };
-
-            recognition.onerror = () => {
-                recognition.stop();
-            };
+            function playNextInQueue() {
+                if (audioQueue.length === 0) { isPlaying = false; return; }
+                isPlaying = true;
+                readerAudio.src = audioQueue.shift();
+                readerAudio.play();
+                startTimestamp = Date.now();
+                requestAnimationFrame(highlightLoop);
+                
+                readerAudio.onended = () => {
+                    // Update global timing offset if needed
+                    // For simplicity, we assume continuous timing from backend
+                    playNextInQueue();
+                };
+            }
         }
 
-        function renderText() {
-            textInput.innerHTML = committedText + (interimText ? ` <span class="interim">${interimText}</span>` : "");
-            updateStats();
-            textInput.scrollTop = textInput.scrollHeight;
-        }
-
-        async function refineText(text) {
-            try {
-                const res = await fetch('/refine-transcript', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-                const data = await res.json();
-                if (data.refined && data.refined !== text) {
-                    // Simple replacement for now
-                    committedText = committedText.replace(text, data.refined);
-                    renderText();
+        function highlightLoop() {
+            if (!isReading || readerAudio.paused) return;
+            const elapsed = readerAudio.currentTime;
+            
+            const word = wordTimings.find(w => elapsed >= w.start_time && elapsed < w.end_time);
+            if (word) {
+                // Highlight text panel
+                document.querySelectorAll('.word-current').forEach(el => el.classList.remove('word-current'));
+                const span = document.getElementById(`word-${word.word_index}`);
+                if (span) {
+                    span.classList.add('word-current');
+                    span.scrollIntoView({behavior:'smooth', block:'center'});
                 }
-            } catch (err) {}
+                // Highlight PDF overlay
+                const pdfSpan = document.getElementById(`pdf-word-${word.word_index}`);
+                if (pdfSpan) pdfSpan.classList.add('word-current');
+                
+                // Mark as read
+                for(let i=0; i<word.word_index; i++) {
+                    const prev = document.getElementById(`word-${i}`);
+                    if (prev) prev.classList.add('word-read');
+                }
+                
+                // Progress
+                const progress = (word.word_index / readerDoc.pages[currentPageNum].word_count) * 100;
+                document.getElementById('read-progress').style.width = progress + '%';
+            }
+            requestAnimationFrame(highlightLoop);
         }
 
-        function toggleSTT() {
-            if (!recognition) {
-                alert("STT not supported in this browser.");
-                return;
-            }
-            if (!isRecording) {
-                committedText = textInput.innerText.trim();
-                recognition.start();
-            } else {
-                recognition.stop();
-            }
+        function pauseReader() {
+            isReading = false;
+            readerAudio.pause();
+            updatePlayBtn(false);
+            cancelAnimationFrame(animationFrame);
         }
+
+        function stopReader() {
+            pauseReader();
+            readerAudio.src = "";
+            wordTimings = [];
+            currentWordIdx = -1;
+            document.querySelectorAll('.word-current, .word-read').forEach(el => el.classList.remove('word-current', 'word-read'));
+            document.getElementById('read-progress').style.width = '0%';
+        }
+
+        function updatePlayBtn(active) {
+            document.getElementById('play-icon').classList.toggle('hidden', active);
+            document.getElementById('pause-icon').classList.toggle('hidden', !active);
+        }
+
     </script>
 </body>
 </html>

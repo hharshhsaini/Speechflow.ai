@@ -12,3 +12,4 @@ anthropic
 pydub
 soundfile
 python-dotenv
+PyMuPDF
