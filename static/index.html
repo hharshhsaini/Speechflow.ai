@@ -650,6 +650,8 @@
         let wordTimings = [];
         let isReading = false;
 
+        let chunkDurationOffset = 0;
+
         async function handlePDFUpload(e) {
             const file = e.target.files[0];
             const formData = new FormData();
@@ -703,36 +705,93 @@
             if (next >=0 && next < readerDoc.total_pages) loadReaderPage(next);
         }
 
+        let audioQueue = [];
+        let isPlayingChunk = false;
+        let chunkDurationOffset = 0;
+
         async function startReaderAt(idx) {
+            stopReader();
             isReading = true;
             updateReaderUI(true);
+            
             const ws = new WebSocket(`ws://${location.host}/ws/book-reader`);
             ws.onopen = () => ws.send(JSON.stringify({page_num: currentPageNum, voice: selectedVoiceId, start_word: idx}));
+            
             ws.onmessage = async (e) => {
                 const d = JSON.parse(e.data);
-                if (d.type === 'timing') wordTimings = wordTimings.concat(d.data);
-                else if (d.type === 'audio') {
+                if (d.type === 'timing') {
+                    wordTimings = wordTimings.concat(d.data);
+                } else if (d.type === 'audio') {
                     const blob = await (await fetch(`data:audio/wav;base64,${d.data}`)).blob();
-                    readerAudio.src = URL.createObjectURL(blob);
-                    readerAudio.play();
-                    requestAnimationFrame(readerLoop);
+                    audioQueue.push(URL.createObjectURL(blob));
+                    if (!isPlayingChunk) playNextChunk();
                 }
             };
+
+            async function playNextChunk() {
+                if (audioQueue.length === 0 || !isReading) {
+                    isPlayingChunk = false;
+                    return;
+                }
+                isPlayingChunk = true;
+                const src = audioQueue.shift();
+                readerAudio.src = src;
+                
+                // Wait for metadata to get duration for the offset
+                readerAudio.onloadedmetadata = () => {
+                    readerAudio.play();
+                    requestAnimationFrame(readerLoop);
+                };
+
+                readerAudio.onended = () => {
+                    chunkDurationOffset += readerAudio.duration;
+                    playNextChunk();
+                };
+            }
         }
 
         function readerLoop() {
             if (!isReading || readerAudio.paused) return;
-            const t = readerAudio.currentTime;
-            const w = wordTimings.find(wt => t >= wt.start_time && t < wt.end_time);
-            if (w) {
+            
+            const totalElapsed = chunkDurationOffset + readerAudio.currentTime;
+            const word = wordTimings.find(wt => totalElapsed >= wt.start_time && totalElapsed < wt.end_time);
+            
+            if (word) {
+                // Highlight text panel
                 document.querySelectorAll('.reader-word.current').forEach(el => el.classList.remove('current'));
-                const s = document.getElementById(`rw-${w.word_index}`);
-                if (s) { s.classList.add('current'); s.scrollIntoView({behavior:'smooth', block:'center'}); }
+                const s = document.getElementById(`rw-${word.word_index}`);
+                if (s) { 
+                    s.classList.add('current'); 
+                    s.scrollIntoView({behavior:'smooth', block:'center'}); 
+                }
+                // Highlight PDF overlay
+                document.querySelectorAll('.pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
+                const ps = document.getElementById(`pw-${word.word_index}`);
+                if (ps) ps.classList.add('current');
             }
             requestAnimationFrame(readerLoop);
         }
 
-        function toggleReaderPlay() { if(isReading) { readerAudio.pause(); isReading=false; updateReaderUI(false); } else startReaderAt(0); }
+        function toggleReaderPlay() { 
+            if(isReading) { 
+                stopReader(); 
+            } else { 
+                startReaderAt(0); 
+            } 
+        }
+
+        function stopReader() {
+            isReading = false;
+            isPlayingChunk = false;
+            readerAudio.pause();
+            readerAudio.src = "";
+            audioQueue = [];
+            wordTimings = [];
+            chunkDurationOffset = 0;
+            updateReaderUI(false);
+            document.querySelectorAll('.reader-word.current, .pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
+        }
+
         function updateReaderUI(active) {
             document.getElementById('r-play').classList.toggle('hidden', active);
             document.getElementById('r-pause').classList.toggle('hidden', !active);

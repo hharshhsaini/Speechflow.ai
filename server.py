@@ -4,6 +4,7 @@ import json
 import base64
 import asyncio
 import tempfile
+import re
 import fitz # PyMuPDF
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
@@ -15,14 +16,13 @@ from agent.stt import transcribe
 
 app = FastAPI(title="SpeechFlow AI Agent")
 
-# Session storage for PDF data (In-memory for simplicity)
+# Session storage for PDF data
 PDF_SESSION = {
     "doc": None,
     "pages": [],
     "path": ""
 }
 
-# Serve static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class TokenizeRequest(BaseModel):
@@ -66,7 +66,6 @@ async def refine_transcript(request: Request):
 
 @app.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
-    # Save to temp file
     suffix = os.path.splitext(file.filename)[1]
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         tmp.write(await file.read())
@@ -82,8 +81,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         for i in range(len(doc)):
             page = doc[i]
             text = page.get_text()
-            # Extract words with coordinates
-            words_raw = page.get_text("words") # (x0, y0, x1, y1, "word", block_no, line_no, word_no)
+            words_raw = page.get_text("words")
             words = []
             for w in words_raw:
                 words.append({
@@ -128,6 +126,20 @@ async def get_pdf_page_data(page_num: int):
         raise HTTPException(status_code=404, detail="Page not found")
     return PDF_SESSION["pages"][page_num]
 
+def split_into_sentences(words):
+    """Group words into sentences based on punctuation."""
+    sentences = []
+    current_sent = []
+    for w in words:
+        current_sent.append(w)
+        # End sentence on ., !, or ? if it's the end of a word
+        if re.search(r'[.!?]$', w["text"]):
+            sentences.append(current_sent)
+            current_sent = []
+    if current_sent:
+        sentences.append(current_sent)
+    return sentences
+
 @app.websocket("/ws/book-reader")
 async def websocket_book_reader(websocket: WebSocket):
     await websocket.accept()
@@ -147,34 +159,26 @@ async def websocket_book_reader(websocket: WebSocket):
             page_data = PDF_SESSION["pages"][page_num]
             words_to_read = page_data["words"][start_word_idx:]
             
-            # Group words into small segments (e.g. 10 words) for better responsiveness
-            chunk_size = 15
-            for i in range(0, len(words_to_read), chunk_size):
-                chunk = words_to_read[i:i+chunk_size]
-                text_to_synthesize = " ".join([w["text"] for w in chunk])
+            # Split into natural sentences for smoother reading
+            sentences = split_into_sentences(words_to_read)
+            
+            accumulated_duration = 0.0
+            
+            for sent_words in sentences:
+                text_to_synthesize = " ".join([w["text"] for w in sent_words])
                 
-                # Use pipeline directly to get chunks
-                prefix = voice[0].lower()
                 lang_code = VOICE_REGISTRY.get(voice, {}).get('lang_code', 'a')
                 pipeline = get_pipeline(lang_code)
                 actual_voice = resolve_voice_path(voice)
                 
-                timing_data = []
-                accumulated_duration = 0.0
-                
                 for _, ps, audio in pipeline(text_to_synthesize, voice=actual_voice, speed=speed):
                     if audio is not None:
-                        # audio is a torch tensor
-                        duration = len(audio) / 24000.0 # 24kHz
+                        duration = len(audio) / 24000.0
+                        total_chars = sum(len(w["text"]) for w in sent_words)
                         
-                        # Estimate word timings for this chunk
-                        # We have the text_to_synthesize and the total duration for this chunk
-                        # We'll split it proportionally by word length
-                        words_in_audio = chunk # Simple assumption for now
-                        total_chars = sum(len(w["text"]) for w in words_in_audio)
-                        
+                        timing_data = []
                         current_word_start = accumulated_duration
-                        for w_idx, w in enumerate(words_in_audio):
+                        for w in sent_words:
                             w_dur = (len(w["text"]) / total_chars) * duration
                             timing_data.append({
                                 "word_index": w["word_index"],
@@ -184,13 +188,11 @@ async def websocket_book_reader(websocket: WebSocket):
                             })
                             current_word_start += w_dur
                         
-                        # Send timing first
                         await websocket.send_json({
                             "type": "timing",
                             "data": timing_data
                         })
                         
-                        # Send audio
                         import soundfile as sf
                         buffer = io.BytesIO()
                         sf.write(buffer, audio.numpy(), 24000, format='WAV')
@@ -208,7 +210,6 @@ async def websocket_book_reader(websocket: WebSocket):
     except Exception as e:
         print(f"Book reader error: {e}")
 
-# Existing Studio WebSocket
 @app.websocket("/ws/stream")
 async def websocket_stream(websocket: WebSocket):
     await websocket.accept()
@@ -220,7 +221,6 @@ async def websocket_stream(websocket: WebSocket):
             voice = data.get("voice", "af_heart")
             speed = data.get("speed", 1.0)
             
-            prefix = voice[0].lower()
             lang_code = VOICE_REGISTRY.get(voice, {}).get('lang_code', 'a')
             pipeline = get_pipeline(lang_code)
             actual_voice = resolve_voice_path(voice)
