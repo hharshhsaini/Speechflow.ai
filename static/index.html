@@ -596,7 +596,10 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return;
             recognition = new SpeechRecognition();
-            recognition.continuous = true; recognition.interimResults = true;
+            recognition.continuous = true; 
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
             recognition.onresult = (e) => {
                 let interim = "";
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
@@ -617,6 +620,11 @@
                 document.getElementById('dictation-bar').classList.add('active');
             };
             recognition.onerror = (e) => {
+                console.error("Speech Recognition Error:", e);
+                if (e.error === 'no-speech') {
+                    // Silently restart if no speech detected
+                    return;
+                }
                 sttDesired = false;
                 showToast("Mic error: " + (e && e.error ? e.error : "unknown"), "error");
             };
