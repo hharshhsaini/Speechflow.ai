@@ -1,0 +1,14 @@
+-e .
+fastapi
+uvicorn[standard]
+websockets
+python-multipart
+openai-whisper
+sounddevice
+webrtcvad-wheels
+numpy
+scipy
+anthropic
+pydub
+soundfile
+python-dotenv

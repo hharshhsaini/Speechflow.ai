@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeechFlow | Pro Neural Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #111827;
+            --surface-lighter: #1f2937;
+            --primary: #f97316;
+            --primary-glow: rgba(249, 115, 22, 0.2);
+            --secondary: #6366f1;
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --accent-error: #ef4444;
+            --accent-success: #22c55e;
+            --glass: rgba(17, 24, 39, 0.7);
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(249, 115, 22, 0.1) 0px, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        .brand h1 { margin: 0; font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em; }
+        .brand h1 span { color: var(--primary); }
+        .brand p { margin: 0.5rem 0 0 0; color: var(--text-muted); font-size: 1.1rem; font-weight: 300; }
+
+        .hardware-badge {
+            background: var(--surface-lighter);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: -0.5rem;
+        }
+
+        .panel-header h2 { margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 600; }
+
+        .input-container { position: relative; }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            color: #fff;
+            padding: 1.25rem;
+            font-family: inherit;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
+
+        .mic-btn {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 4.5rem;
+            height: 4.5rem;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.5);
+            z-index: 10;
+        }
+        .mic-btn:hover { transform: scale(1.05); }
+        .mic-btn.active { background: var(--accent-error); animation: pulse 1.5s infinite; }
+        .mic-btn svg { width: 2rem; height: 2rem; fill: white; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .control-group label { display: block; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+
+        select {
+            width: 100%;
+            background: var(--surface-lighter);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .slider-wrap { display: flex; align-items: center; gap: 1rem; background: var(--surface-lighter); padding: 0.6rem 1.2rem; border-radius: 0.75rem; border: 1px solid var(--border); }
+        input[type="range"] { flex: 1; accent-color: var(--primary); }
+        .val-display { font-family: 'JetBrains Mono', monospace; color: var(--primary); font-weight: 700; width: 3.5rem; text-align: right; }
+
+        .presets { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn-ghost {
+            background: var(--surface-lighter);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.7rem 1.4rem;
+            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-ghost:hover { background: var(--border); }
+
+        .tabs { display: flex; gap: 0.5rem; background: var(--surface-lighter); padding: 0.4rem; border-radius: 1.25rem; }
+        .tab {
+            flex: 1;
+            padding: 0.85rem;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0.85rem;
+            color: var(--text-muted);
+        }
+        .tab.active { background: var(--surface); color: white; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        .btn-action {
+            width: 100%;
+            padding: 1.75rem;
+            border-radius: 1.5rem;
+            border: none;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
+        }
+
+        .btn-generate { background: var(--primary); color: white; }
+        .btn-generate:hover { transform: translateY(-4px); box-shadow: 0 25px 50px -15px var(--primary-glow); }
+
+        .audio-preview {
+            background: #000;
+            border-radius: 1.5rem;
+            padding: 2.25rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        audio { width: 100%; filter: invert(1); height: 45px; }
+
+        .tokens-area {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--primary);
+            min-height: 140px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .status-msg { font-size: 0.9rem; color: var(--primary); font-weight: 700; height: 1.4rem; display: flex; align-items: center; gap: 0.6rem; }
+
+        .visualizer { display: flex; align-items: center; gap: 4px; height: 20px; }
+        .bar { width: 4px; background: var(--primary); border-radius: 10px; }
+        .bar.anim { animation: vis 0.8s ease-in-out infinite; }
+        @keyframes vis { 0%, 100% { height: 6px; } 50% { height: 20px; } }
+
+        .hidden { display: none; }
+        .spinner { width: 1.75rem; height: 1.75rem; border: 4px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="brand">
+                <h1>SpeechFlow<span>.ai</span></h1>
+                <p>Advanced Neural Studio | Pro Suite</p>
+            </div>
+            <div class="hardware-badge">
+                <span id="hw-status" style="color: var(--accent-success)">●</span> Local AI Engine
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Panel: Workspace -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Workspace</h2>
+                    <div id="stt-status" class="status-msg"></div>
+                </div>
+                
+                <div class="input-container">
+                    <textarea id="textInput" placeholder="Enter text or click mic to dictate live..."></textarea>
+                    <button id="micBtn" class="mic-btn" onclick="toggleSTT()" title="Live Transcription">
+                        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                    </button>
+                </div>
+
+                <div class="controls-row">
+                    <div class="control-group">
+                        <label>Speaker Profile</label>
+                        <select id="voiceSelect"></select>
+                    </div>
+                    <div class="control-group">
+                        <label>Speed Tuning</label>
+                        <div class="slider-wrap">
+                            <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+                            <span id="speedVal" class="val-display">1.0x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Shortcuts</label>
+                    <div class="presets">
+                        <button class="btn-ghost" onclick="fetchPreset('/random-quote')">Quote</button>
+                        <button class="btn-ghost" onclick="fetchPreset('/gatsby')">Gatsby</button>
+                        <button class="btn-ghost" style="color: var(--accent-error)" onclick="clearText()">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Studio -->
+            <div class="panel">
+                <div class="tabs">
+                    <div id="tab-gen" class="tab active" onclick="switchMode('gen')">Studio Master</div>
+                    <div id="tab-stream" class="tab" onclick="switchMode('stream')">Live Stream</div>
+                </div>
+
+                <div class="output-actions">
+                    <div id="mode-gen">
+                        <button id="genBtn" class="btn-action btn-generate" onclick="generateAudio()">
+                            <div id="genSpinner" class="spinner hidden"></div>
+                            <span id="genText">Generate Master</span>
+                        </button>
+                    </div>
+
+                    <div id="mode-stream" class="hidden">
+                        <div class="controls-row" style="grid-template-columns: 2fr 1fr">
+                            <button id="streamBtn" class="btn-action btn-stream" onclick="startStream()">Start Stream</button>
+                            <button class="btn-action btn-ghost" style="background: var(--accent-error); border: none" onclick="stopStream()">Stop</button>
+                        </div>
+                    </div>
+
+                    <div class="audio-preview">
+                        <div style="display: flex; justify-content: space-between; align-items: center">
+                            <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Acoustic Preview</div>
+                            <div id="vis" class="visualizer hidden">
+                                <div class="bar anim" style="animation-delay: 0.1s"></div>
+                                <div class="bar anim" style="animation-delay: 0.3s"></div>
+                                <div class="bar anim" style="animation-delay: 0.5s"></div>
+                                <div class="bar anim" style="animation-delay: 0.2s"></div>
+                            </div>
+                        </div>
+                        <audio id="genAudio" controls></audio>
+                        <div id="stream-indicator" class="status-msg hidden">Streaming...</div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Neural Tokens</label>
+                        <div id="tokensOutput" class="tokens-area">Data pending...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const voiceSelect = document.getElementById('voiceSelect');
+        const textInput = document.getElementById('textInput');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedVal = document.getElementById('speedVal');
+        const genAudio = document.getElementById('genAudio');
+        const genBtn = document.getElementById('genBtn');
+        const genSpinner = document.getElementById('genSpinner');
+        const tokensOutput = document.getElementById('tokensOutput');
+        const micBtn = document.getElementById('micBtn');
+        const sttStatus = document.getElementById('stt-status');
+        const visualizer = document.getElementById('vis');
+
+        let mode = 'gen';
+        let isRecording = false;
+        let sttWs = null;
+        let audioContext = null;
+        let scriptProcessor = null;
+        let streamWs = null;
+        let playbackCtx = null;
+        let nextStartTime = 0;
+        let initialText = "";
+
+        window.onload = () => {
+            fetchVoices();
+            speedSlider.oninput = () => speedVal.textContent = speedSlider.value + 'x';
+        };
+
+        async function fetchVoices() {
+            try {
+                const res = await fetch('/voices');
+                const voices = await res.json();
+                voices.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v.id;
+                    opt.textContent = `${v.name} (${v.gender})`;
+                    voiceSelect.appendChild(opt);
+                });
+            } catch (err) {}
+        }
+
+        async function fetchPreset(url) {
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                textInput.value = data.text;
+            } catch (err) {}
+        }
+
+        function clearText() { textInput.value = ''; }
+
+        function switchMode(m) {
+            mode = m;
+            document.getElementById('tab-gen').classList.toggle('active', m === 'gen');
+            document.getElementById('tab-stream').classList.toggle('active', m === 'stream');
+            document.getElementById('mode-gen').classList.toggle('hidden', m !== 'gen');
+            document.getElementById('mode-stream').classList.toggle('hidden', m !== 'stream');
+        }
+
+        async function generateAudio() {
+            const text = textInput.value.trim();
+            if (!text) return;
+            genBtn.disabled = true;
+            genSpinner.classList.remove('hidden');
+            visualizer.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/synthesize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice: voiceSelect.value, speed: parseFloat(speedSlider.value) })
+                });
+                const blob = await res.blob();
+                genAudio.src = URL.createObjectURL(blob);
+                genAudio.play();
+                
+                const tokRes = await fetch('/tokenize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice: voiceSelect.value })
+                });
+                const tokData = await tokRes.json();
+                tokensOutput.textContent = tokData.phonemes;
+            } catch (err) {} finally {
+                genBtn.disabled = false;
+                genSpinner.classList.add('hidden');
+                setTimeout(() => visualizer.classList.add('hidden'), 2000);
+            }
+        }
+
+        async function toggleSTT() {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+                    const source = audioContext.createMediaStreamSource(stream);
+                    scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+                    
+                    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    sttWs = new WebSocket(`${protocol}//${window.location.host}/ws/stt`);
+                    
+                    initialText = textInput.value;
+                    sttWs.onopen = () => {
+                        sttStatus.textContent = "LIVE TRANSCRIPTION...";
+                        micBtn.classList.add('active');
+                        isRecording = true;
+                        source.connect(scriptProcessor);
+                        scriptProcessor.connect(audioContext.destination);
+                    };
+
+                    sttWs.onmessage = (e) => {
+                        const data = JSON.parse(e.data);
+                        if (data.text) {
+                            textInput.value = initialText + (initialText ? "\n" : "") + data.text;
+                            textInput.scrollTop = textInput.scrollHeight;
+                        }
+                    };
+
+                    scriptProcessor.onaudioprocess = (e) => {
+                        if (!isRecording || sttWs.readyState !== WebSocket.OPEN) return;
+                        const inputData = e.inputBuffer.getChannelData(0);
+                        const pcmData = new Int16Array(inputData.length);
+                        for (let i = 0; i < inputData.length; i++) {
+                            pcmData[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF;
+                        }
+                        sttWs.send(pcmData.buffer);
+                    };
+
+                    sttWs.onclose = () => stopRecording(stream);
+                } catch (err) { alert("Mic required."); }
+            } else { if (sttWs) sttWs.close(); }
+        }
+
+        function stopRecording(stream) {
+            isRecording = false;
+            micBtn.classList.remove('active');
+            sttStatus.textContent = "";
+            if (scriptProcessor) scriptProcessor.disconnect();
+            if (audioContext) audioContext.close();
+            if (stream) stream.getTracks().forEach(t => t.stop());
+        }
+
+        async function startStream() {
+            const text = textInput.value.trim();
+            if (!text) return;
+            if (!playbackCtx) playbackCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+            if (playbackCtx.state === 'suspended') await playbackCtx.resume();
+            nextStartTime = playbackCtx.currentTime;
+            
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            streamWs = new WebSocket(`${protocol}//${window.location.host}/ws/stream`);
+            
+            streamWs.onopen = () => {
+                streamWs.send(JSON.stringify({ text, voice: voiceSelect.value, speed: parseFloat(speedSlider.value) }));
+                document.getElementById('stream-indicator').classList.remove('hidden');
+                visualizer.classList.remove('hidden');
+                tokensOutput.textContent = '';
+            };
+
+            streamWs.onmessage = async (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'audio_chunk') {
+                    const binary = atob(data.data);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    const audioBuffer = await playbackCtx.decodeAudioData(bytes.buffer);
+                    const source = playbackCtx.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(playbackCtx.destination);
+                    const start = Math.max(nextStartTime, playbackCtx.currentTime);
+                    source.start(start);
+                    nextStartTime = start + audioBuffer.duration;
+                    tokensOutput.textContent += " " + data.phonemes;
+                } else if (data.type === 'done') { stopStream(); }
+            };
+        }
+
+        function stopStream() {
+            if (streamWs) { streamWs.close(); streamWs = null; }
+            document.getElementById('stream-indicator').classList.add('hidden');
+            setTimeout(() => visualizer.classList.add('hidden'), 1000);
+        }
+    </script>
+</body>
+</html>
