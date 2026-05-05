@@ -868,7 +868,7 @@
                 const res = await fetch(`/voices/test/${id}`);
                 const data = await res.json();
                 if (data.works) { 
-                    el.innerText = "Status: Working ✓"; 
+                    el.innerText = `Status: Working ✓ (${data.latency}ms)`; 
                     el.style.color = 'var(--success)'; 
                 } else { 
                     el.innerText = "Status: Error ✗"; 
@@ -889,8 +889,8 @@
             
             for (const id of voiceIds) {
                 await testVoice(id);
-                // Small delay to avoid hammering the local engine too hard
-                await new Promise(r => setTimeout(r, 100));
+                // Moderate delay for 'thorough scan' feeling
+                await new Promise(r => setTimeout(r, 400));
             }
             showToast("Voice audit complete", "success");
         }

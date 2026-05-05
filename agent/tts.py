@@ -118,7 +118,7 @@ def synthesize(text: str, voice: str = 'af_heart', speed: float = 1.0) -> bytes:
 
 def validate_voice(voice_id: str) -> bool:
     try:
-        audio = synthesize("test", voice_id)
+        audio = synthesize("Neural integrity check.", voice_id)
         return len(audio) > 0
     except:
         return False
