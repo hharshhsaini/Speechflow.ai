@@ -1,31 +1,23 @@
 FROM python:3.12-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    HOST=0.0.0.0 \
-    PORT=8000 \
-    WHISPER_MODEL=small
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libsndfile1 \
+    ffmpeg \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    espeak-ng \
-    ffmpeg \
-    libsndfile1 \
-    && rm -rf /var/lib/apt/lists/*
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY pyproject.toml uv.lock requirements_agent.txt README.md LICENSE /app/
-COPY speechflow /app/speechflow
-COPY agent /app/agent
-COPY static /app/static
-COPY local_models /app/local_models
-COPY server.py PROJECT_REFERENCE.md run.sh /app/
+# Copy project files
+COPY . .
 
-RUN pip install --upgrade pip setuptools wheel && \
-    pip install .
-
+# Expose port
 EXPOSE 8000
 
-CMD ["python", "server.py"]
+# Start server
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]

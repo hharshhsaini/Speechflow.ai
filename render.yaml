@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: speechflow-studio
+    env: docker
+    plan: starter
+    region: ohio
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: WHISPER_MODEL
+        value: base
+      - key: PORT
+        value: 8000
