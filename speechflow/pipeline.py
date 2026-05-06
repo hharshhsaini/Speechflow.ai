@@ -15,6 +15,7 @@ ALIASES = {
     'fr-fr': 'f',
     'hi': 'h',
     'it': 'i',
+    'ko': 'k',
     'pt-br': 'p',
     'ja': 'j',
     'zh': 'z',
@@ -30,6 +31,7 @@ LANG_CODES = dict(
     f='fr-fr',
     h='hi',
     i='it',
+    k='ko',
     p='pt-br',
 
     # pip install misaki[ja]
@@ -123,7 +125,7 @@ class KPipeline:
         elif lang_code == 'j':
             try:
                 from misaki import ja
-                self.g2p = ja.JAG2P()
+                self.g2p = ja.JAG2P(version='pyopenjtalk')
             except ImportError:
                 logger.error("You need to `pip install misaki[ja]` to use lang_code='j'")
                 raise

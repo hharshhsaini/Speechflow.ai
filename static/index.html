@@ -221,9 +221,13 @@
             text-align: center;
             cursor: pointer;
             position: relative;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .voice-card:hover { border-color: var(--accent-glow); transform: translateY(-4px); }
-        .voice-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .voice-card.selected {
+            border-color: var(--accent);
+            box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 1px rgba(249, 115, 22, 0.22);
+        }
         
         .avatar { width: 3.5rem; height: 3.5rem; background: var(--bg-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.75rem; border: 2px solid var(--border); }
         .voice-card.selected .avatar { border-color: var(--accent); color: var(--accent); }
@@ -266,20 +270,353 @@
         .btn-action-large:hover { transform: translateY(-4px); background: var(--accent-hover); }
 
         /* Reader Tab Styling */
-        .reader-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.5rem; height: 600px; }
-        .pdf-box { background: #000; border-radius: 1rem; border: 1px solid var(--border); overflow: auto; position: relative; display: flex; justify-content: center; }
-        .text-box { background: var(--bg-card); border-radius: 1rem; border: 1px solid var(--border); padding: 2.5rem; overflow-y: auto; font-size: 1.3rem; line-height: 2.2; }
+        .reader-shell { display: flex; flex-direction: column; gap: 1.15rem; }
+        .reader-toolbar {
+            display: grid;
+            grid-template-columns: auto minmax(160px, 1fr) auto;
+            gap: 1rem;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)), var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.3rem;
+            padding: 1rem 1.25rem;
+        }
+        .reader-page-badge { text-align: center; font-weight: 800; font-size: 1rem; color: var(--text-primary); }
+        .reader-toolbar-actions { display: flex; align-items: center; gap: 0.75rem; justify-content: flex-end; }
+        .reader-play-btn { position: static; width: 3.5rem; height: 3.5rem; flex-shrink: 0; }
+        .reader-settings-bar {
+            display: grid;
+            grid-template-columns: minmax(240px, 1.1fr) minmax(240px, 1fr) minmax(260px, 1.15fr);
+            gap: 1rem;
+        }
+        .reader-control-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)), var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.1rem;
+            padding: 1rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .reader-control-label {
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 800;
+        }
+        .reader-select {
+            width: 100%;
+            background: rgba(10, 15, 26, 0.75);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 0.85rem;
+            padding: 0.85rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            outline: none;
+        }
+        .reader-select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16); }
+        .reader-slider { width: 100%; accent-color: var(--accent); }
+        .reader-speed-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: var(--text-secondary); font-weight: 700; }
+        .reader-status-text { color: var(--text-secondary); line-height: 1.45; font-size: 0.95rem; font-weight: 600; min-height: 2.8rem; }
+
+        .reader-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+            gap: 1.5rem;
+            height: clamp(560px, 74vh, 860px);
+            min-height: 560px;
+            align-items: stretch;
+        }
+        .reader-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)), var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.35rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            max-height: 100%;
+        }
+        .reader-panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+        }
+        .reader-panel-title { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+        .reader-panel-sub { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; }
+        .reader-panel-meta { font-size: 0.8rem; color: var(--accent); font-weight: 700; text-align: right; }
+        .reader-panel-tools { display: flex; align-items: center; gap: 0.85rem; justify-content: flex-end; flex-wrap: wrap; }
+        .reader-zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem;
+            border-radius: 999px;
+            background: rgba(10, 15, 26, 0.72);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .reader-zoom-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+        }
+        .reader-zoom-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(249, 115, 22, 0.08);
+            transform: translateY(-1px);
+        }
+        .reader-zoom-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .reader-zoom-value {
+            min-width: 3.2rem;
+            text-align: center;
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+        .pdf-box {
+            background: #05070d;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 1rem;
+            flex: 1;
+            min-height: 0;
+            max-height: 100%;
+            scrollbar-gutter: stable both-edges;
+            overscroll-behavior: contain;
+        }
+        .pdf-viewport { position: relative; flex: 0 0 auto; margin: 0 auto; }
+        #pdfImage { width: 100%; height: auto; display: block; border-radius: 0.8rem; box-shadow: 0 24px 40px rgba(0,0,0,0.4); transition: opacity 0.18s ease; }
+        #pdf-overlay { position: absolute; inset: 0; pointer-events: none; }
+        .text-box {
+            background: transparent;
+            padding: 1.5rem 1.75rem 2rem;
+            overflow: auto;
+            font-size: 1.22rem;
+            line-height: 2.05;
+            color: #eef2ff;
+            flex: 1;
+            min-height: 0;
+            max-height: 100%;
+            scrollbar-gutter: stable both-edges;
+        }
+        .reader-empty {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
         
-        .reader-word { cursor: pointer; border-radius: 4px; padding: 0 4px; transition: none; }
-        .reader-word.current { background: var(--accent) !important; color: #000; font-weight: 800; }
-        .reader-word.read { color: var(--text-muted); background: rgba(255,255,255,0.03); }
+        .reader-word { cursor: pointer; border-radius: 0.55rem; padding: 0.08rem 0.18rem; transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease; }
+        .reader-word.current { background: rgba(249, 115, 22, 0.18) !important; color: #fff; font-weight: 800; box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.55); }
+        .reader-word.read { color: rgba(255,255,255,0.48); }
+        .pdf-word-highlight {
+            position: absolute;
+            border-radius: 4px;
+            background: rgba(249, 115, 22, 0);
+            box-shadow: inset 0 0 0 1px transparent;
+            opacity: 0;
+            transition: background 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+        }
+        .pdf-word-highlight.read { opacity: 0.3; background: rgba(249, 115, 22, 0.1); }
+        .pdf-word-highlight.current {
+            opacity: 1;
+            background: rgba(249, 115, 22, 0.28);
+            box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.6), 0 0 0 1px rgba(249, 115, 22, 0.18);
+        }
 
         /* Voice Lab */
-        .lab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-        .lab-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
-        .lab-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .lab-btn { background: var(--bg-primary); border: 1px solid var(--border); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
-        .lab-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .lab-shell { display: flex; flex-direction: column; gap: 1.25rem; }
+        .lab-hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1.25rem;
+            padding: 1.35rem 1.45rem;
+            border-radius: 1.45rem;
+            border: 1px solid var(--border);
+            background:
+                radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 34%),
+                linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+                var(--bg-card);
+        }
+        .lab-hero-copy { margin: 0; }
+        .lab-hero-copy p { max-width: 38rem; }
+        .lab-hero-actions { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+        .lab-audit-btn {
+            background: var(--accent);
+            border: 1px solid transparent;
+            color: white;
+            padding: 0.9rem 1.4rem;
+            border-radius: 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+            box-shadow: 0 18px 30px -18px rgba(249, 115, 22, 0.7);
+        }
+        .lab-audit-btn:hover { transform: translateY(-2px); background: var(--accent-hover); }
+        .lab-audit-btn.running {
+            background: rgba(249, 115, 22, 0.08);
+            border-color: rgba(249, 115, 22, 0.35);
+            color: var(--accent);
+            box-shadow: none;
+        }
+        .lab-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .lab-summary-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)), var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.1rem;
+            padding: 1rem 1.05rem;
+            min-height: 108px;
+        }
+        .lab-summary-card.accent { border-color: rgba(249, 115, 22, 0.26); box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.08); }
+        .lab-summary-value { font-size: 1.65rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.03em; }
+        .lab-summary-label { margin-top: 0.2rem; font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-weight: 800; }
+        .lab-summary-note { margin-top: 0.55rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; }
+        .lab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+        .lab-card {
+            position: relative;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+                linear-gradient(135deg, rgba(255,255,255,0.02), transparent 45%),
+                var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.95rem;
+            min-height: 245px;
+            overflow: hidden;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .lab-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(249, 115, 22, 0.26);
+            box-shadow: 0 18px 40px -30px rgba(0,0,0,0.85), 0 0 0 1px rgba(249, 115, 22, 0.08);
+        }
+        .lab-card-header { display: flex; align-items: flex-start; margin-bottom: 0; padding-right: 5rem; }
+        .lab-voice-main { display: flex; align-items: center; gap: 0.9rem; min-width: 0; }
+        .lab-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(9, 14, 26, 0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .lab-voice-copy { min-width: 0; }
+        .lab-voice-name { font-size: 1.12rem; font-weight: 900; color: var(--text-primary); line-height: 1.15; }
+        .lab-voice-meta { margin-top: 0.22rem; font-size: 0.8rem; color: var(--text-secondary); }
+        .lab-voice-id {
+            margin-top: 0.35rem;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.42);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            letter-spacing: 0.04em;
+        }
+        .lab-grade {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+        .lab-grade.grade-a {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.12);
+            border-color: rgba(251, 191, 36, 0.18);
+        }
+        .lab-grade.grade-b {
+            color: #fb923c;
+            background: rgba(251, 146, 60, 0.12);
+            border-color: rgba(251, 146, 60, 0.18);
+        }
+        .lab-chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .lab-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.62rem;
+            border-radius: 999px;
+            background: rgba(9, 14, 26, 0.66);
+            border: 1px solid rgba(255,255,255,0.07);
+            color: var(--text-secondary);
+            font-size: 0.74rem;
+            font-weight: 700;
+        }
+        .lab-card-note {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            line-height: 1.5;
+            min-height: 2.4rem;
+        }
+        .lab-card-actions { display: flex; gap: 0.65rem; margin-top: auto; }
+        .lab-btn {
+            flex: 1;
+            min-width: 0;
+            background: rgba(9, 14, 26, 0.74);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
+            padding: 0.72rem 0.9rem;
+            border-radius: 0.85rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 800;
+            transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+        }
+        .lab-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(249, 115, 22, 0.08); transform: translateY(-1px); }
+        .lab-status {
+            margin-top: 0.1rem;
+            border-radius: 0.9rem;
+            padding: 0.72rem 0.85rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(9, 14, 26, 0.5);
+            color: var(--text-secondary);
+        }
+        .lab-status.pending { color: var(--text-secondary); }
+        .lab-status.testing { color: #93c5fd; border-color: rgba(147, 197, 253, 0.2); background: rgba(59, 130, 246, 0.08); }
+        .lab-status.success { color: #86efac; border-color: rgba(134, 239, 172, 0.2); background: rgba(34, 197, 94, 0.08); }
+        .lab-status.error { color: #fca5a5; border-color: rgba(252, 165, 165, 0.2); background: rgba(239, 68, 68, 0.08); }
 
         /* Toasts */
         .toast-container { position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 1000; pointer-events: none; }
@@ -297,6 +634,18 @@
         .hidden { display: none !important; }
         .spinner { width: 1.5rem; height: 1.5rem; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1180px) {
+            .reader-toolbar { grid-template-columns: 1fr; }
+            .reader-page-badge { text-align: left; }
+            .reader-toolbar-actions { justify-content: flex-start; flex-wrap: wrap; }
+            .reader-settings-bar { grid-template-columns: 1fr; }
+            .reader-layout { grid-template-columns: 1fr; height: auto; min-height: auto; }
+            .reader-panel { min-height: 420px; max-height: min(72vh, 620px); }
+            .lab-hero { align-items: flex-start; flex-direction: column; }
+            .lab-hero-actions { width: 100%; }
+            .lab-audit-btn { width: 100%; }
+        }
 
     </style>
 </head>
@@ -320,10 +669,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 Voice Lab
             </div>
-            <div class="nav-item" data-tab="history" onclick="switchTab('history')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                History
-            </div>
             <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 Settings
@@ -346,7 +691,7 @@
                 <div class="section-label">Workspace</div>
                 <div class="workspace-wrapper">
                     <div class="textarea-container">
-                        <textarea id="textInput" placeholder="Enter text or click mic to dictate live..."></textarea>
+                        <textarea id="textInput" placeholder="Enter text or click mic to dictate live..." maxlength="5000" oninput="updateStudioStats()"></textarea>
                         <button class="floating-mic" id="micBtn" onclick="toggleSTT()">
                             <svg id="mic-svg" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                             <rect id="stop-svg" class="hidden" x="7" y="7" width="10" height="10" fill="white" />
@@ -369,12 +714,12 @@
             <section>
                 <div class="section-label">Speaker Profile</div>
                 <div class="filter-pills">
-                    <div class="pill active" onclick="filterVoices('all')">All</div>
-                    <div class="pill" onclick="filterVoices('American English')">🇺🇸 EN-US</div>
-                    <div class="pill" onclick="filterVoices('British English')">🇬🇧 EN-GB</div>
-                    <div class="pill" onclick="filterVoices('Japanese')">🇯🇵 JA</div>
-                    <div class="pill" onclick="filterVoices('Hindi')">🇮🇳 HI</div>
-                    <div class="pill" onclick="filterVoices('Chinese')">🇨🇳 ZH</div>
+                    <div class="pill active" data-filter="all" onclick="filterVoices('all')">All</div>
+                    <div class="pill" data-filter="American English" onclick="filterVoices('American English')">🇺🇸 EN-US</div>
+                    <div class="pill" data-filter="British English" onclick="filterVoices('British English')">🇬🇧 EN-GB</div>
+                    <div class="pill" data-filter="Japanese" onclick="filterVoices('Japanese')">🇯🇵 JA</div>
+                    <div class="pill" data-filter="Hindi" onclick="filterVoices('Hindi')">🇮🇳 HI</div>
+                    <div class="pill" data-filter="Chinese" onclick="filterVoices('Chinese')">🇨🇳 ZH</div>
                 </div>
                 <div id="voice-scroll" class="voice-scroll-area">
                     <!-- Groups and Cards dynamically injected -->
@@ -408,52 +753,99 @@
                 <p>Upload a PDF and listen with synchronized word highlighting.</p>
             </div>
             
-            <div style="display: flex; gap: 1rem; align-items: center; background: var(--bg-card); padding: 1rem; border-radius: 1rem; border: 1px solid var(--border);">
-                <button class="btn-shortcut" style="background: var(--accent); border: none" onclick="document.getElementById('pdf-upload').click()">Upload PDF</button>
-                <input type="file" id="pdf-upload" class="hidden" accept=".pdf" onchange="handlePDFUpload(event)">
-                <div style="flex: 1; text-align: center; font-weight: 700;" id="reader-page-info">Page 0 of 0</div>
-                <button class="btn-shortcut" onclick="changePage(-1)">PREV</button>
-                <button class="btn-shortcut" onclick="changePage(1)">NEXT</button>
-                <button id="readerPlayBtn" class="floating-mic" style="position: static; width: 3.5rem; height: 3.5rem;" onclick="toggleReaderPlay()">
-                    <svg id="r-play" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    <svg id="r-pause" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                </button>
-            </div>
-
-            <div class="reader-layout">
-                <div class="pdf-box">
-                    <div id="pdf-viewport" style="position: relative;">
-                        <img id="pdfImage" src="" alt="">
-                        <div id="pdf-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+            <div class="reader-shell">
+                <div class="reader-toolbar">
+                    <button class="btn-shortcut" style="background: var(--accent); border: none" onclick="document.getElementById('pdf-upload').click()">Upload PDF</button>
+                    <input type="file" id="pdf-upload" class="hidden" accept=".pdf" onchange="handlePDFUpload(event)">
+                    <div id="reader-page-info" class="reader-page-badge">Page 0 of 0</div>
+                    <div class="reader-toolbar-actions">
+                        <button class="btn-shortcut" onclick="changePage(-1)">PREV</button>
+                        <button class="btn-shortcut" onclick="changePage(1)">NEXT</button>
+                        <button id="readerPlayBtn" class="floating-mic reader-play-btn" onclick="toggleReaderPlay()">
+                            <svg id="r-play" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="r-pause" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
                     </div>
                 </div>
-                <div id="reader-text" class="text-box">
-                    <div style="text-align: center; color: var(--text-muted); margin-top: 5rem;">Upload a PDF to begin.</div>
+
+                <div class="reader-settings-bar">
+                    <div class="reader-control-card">
+                        <div class="reader-control-label">Reader Voice</div>
+                        <select id="readerVoiceSelect" class="reader-select" onchange="changeReaderVoice(this.value)"></select>
+                    </div>
+                    <div class="reader-control-card">
+                        <div class="reader-speed-row">
+                            <div class="reader-control-label">Reading Pace</div>
+                            <div id="reader-speed-value">0.95x</div>
+                        </div>
+                        <input id="readerSpeedInput" class="reader-slider" type="range" min="0.8" max="1.15" step="0.05" value="0.95" oninput="previewReaderSpeed(this.value)" onchange="applyReaderSpeed(this.value)">
+                    </div>
+                    <div class="reader-control-card">
+                        <div class="reader-control-label">Reading Status</div>
+                        <div id="reader-status-text" class="reader-status-text">Upload a PDF, choose a voice, and press play. You can also click any word to begin from that line.</div>
+                    </div>
+                </div>
+
+                <div class="reader-layout">
+                    <div class="reader-panel">
+                        <div class="reader-panel-head">
+                            <div>
+                                <div class="reader-panel-title">Page View</div>
+                                <div class="reader-panel-sub">Live page highlight follows the spoken word.</div>
+                            </div>
+                            <div class="reader-panel-tools">
+                                <div class="reader-panel-meta">PDF Focus</div>
+                                <div class="reader-zoom-controls">
+                                    <button id="reader-zoom-out" class="reader-zoom-btn" onclick="changeReaderZoom(-0.2)" aria-label="Zoom out">-</button>
+                                    <div id="reader-zoom-value" class="reader-zoom-value">100%</div>
+                                    <button id="reader-zoom-in" class="reader-zoom-btn" onclick="changeReaderZoom(0.2)" aria-label="Zoom in">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="reader-pdf-box" class="pdf-box">
+                            <div id="pdf-viewport" class="pdf-viewport">
+                                <img id="pdfImage" src="" alt="">
+                                <div id="pdf-overlay"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reader-panel">
+                        <div class="reader-panel-head">
+                            <div>
+                                <div class="reader-panel-title">Read Along</div>
+                                <div class="reader-panel-sub">Click any word to jump in and continue from there.</div>
+                            </div>
+                            <div id="reader-focus-text" class="reader-panel-meta">Ready</div>
+                        </div>
+                        <div id="reader-text" class="text-box">
+                            <div class="reader-empty">
+                                <div style="font-size: 1.2rem; font-weight: 800;">Upload a PDF to begin.</div>
+                                <div>Once the page is loaded, choose a reader voice and press play for synced narration.</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- VOICE LAB -->
         <div id="tab-lab" class="tab-content">
-            <div class="tab-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
-                <div>
-                    <h2>Voice Lab</h2>
-                    <p>Audit and test all 54 neural voice profiles.</p>
+            <div class="lab-shell">
+                <div class="lab-hero">
+                    <div class="tab-header lab-hero-copy">
+                        <h2>Voice Lab</h2>
+                        <p>Audit, preview, and benchmark every neural voice profile. Quality grades come from the voice registry, where `A` is the preferred profile tier and `B` is an alternate tier.</p>
+                    </div>
+                    <div class="lab-hero-actions">
+                        <button id="labAuditBtn" class="lab-audit-btn" onclick="testAllVoices()">Test All Voices</button>
+                    </div>
                 </div>
-                <button class="btn-shortcut" style="background: var(--accent); border: none; padding: 0.75rem 1.5rem" onclick="testAllVoices()">Test All Voices</button>
+                <div id="lab-summary" class="lab-summary"></div>
+                <div id="lab-grid" class="lab-grid">
+                    <!-- Cards injected -->
+                </div>
             </div>
-            <div id="lab-grid" class="lab-grid">
-                <!-- Cards injected -->
-            </div>
-        </div>
-
-        <!-- HISTORY -->
-        <div id="tab-history" class="tab-content">
-            <div class="tab-header">
-                <h2>History</h2>
-                <p>Your past neural generations.</p>
-            </div>
-            <div style="text-align: center; color: var(--text-muted); margin-top: 10rem;">Session history is currently held in memory.</div>
         </div>
 
         <!-- SETTINGS -->
@@ -483,6 +875,7 @@
         let allVoices = {};
         let selectedVoiceId = 'af_heart';
         let currentTab = 'studio';
+        let currentVoiceFilter = 'all';
 
         // --- CORE NAVIGATION ---
         let isAuditRunning = false;
@@ -538,6 +931,7 @@
                 allVoices = await res.json();
                 renderVoiceCards();
                 renderVoiceLab();
+                populateReaderVoiceSelect();
             } catch (err) { showToast("Failed to load voices", "error"); }
         }
 
@@ -578,26 +972,280 @@
         function selectVoice(id) {
             selectedVoiceId = id;
             document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
-            renderVoiceCards(document.querySelector('.pill.active').innerText === 'All' ? 'all' : document.querySelector('.pill.active').innerText);
+            applySTTLanguage();
+            renderVoiceCards(currentVoiceFilter);
         }
 
         function filterVoices(lang) {
-            document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.innerText.includes(lang) || (lang === 'all' && p.innerText === 'All')));
+            currentVoiceFilter = lang;
+            document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.filter === lang));
             renderVoiceCards(lang);
         }
 
         // --- STUDIO LOGIC ---
+        const STT_LANGUAGE_MAP = {
+            'American English': 'en-US',
+            'British English': 'en-GB',
+            'Japanese': 'ja-JP',
+            'Chinese': 'zh-CN',
+            'Hindi': 'hi-IN'
+        };
+        const WHISPER_LANGUAGE_MAP = {
+            'American English': 'en',
+            'British English': 'en',
+            'Japanese': 'ja',
+            'Chinese': 'zh',
+            'Hindi': 'hi',
+            'Spanish': 'es',
+            'French': 'fr',
+            'Italian': 'it',
+            'Korean': 'ko',
+            'Portuguese': 'pt'
+        };
         let recognition = null;
         let isSTTActive = false;
         let committedText = "";
         let sttDesired = false;
+        let sttRestartTimer = null;
+        let sttLastError = null;
+        let sttFallbackToLocal = false;
+        let sttMode = 'browser';
+        let localSttSocket = null;
+        let localSttStream = null;
+        let localSttAudioContext = null;
+        let localSttSource = null;
+        let localSttProcessor = null;
+        let localSttDraft = "";
+        let localSttStopping = false;
+        let localSttStopTimer = null;
+
+        function getSelectedVoiceMeta() {
+            for (const lang in allVoices) {
+                const voice = allVoices[lang].find(v => v.id === selectedVoiceId);
+                if (voice) return voice;
+            }
+            return null;
+        }
+
+        function getSTTLanguage() {
+            const voice = getSelectedVoiceMeta();
+            if (!voice) return 'en-US';
+            return STT_LANGUAGE_MAP[voice.lang] || 'en-US';
+        }
+
+        function getWhisperLanguage() {
+            const voice = getSelectedVoiceMeta();
+            if (!voice) return 'en';
+            return WHISPER_LANGUAGE_MAP[voice.lang] || 'en';
+        }
+
+        function applySTTLanguage() {
+            const lang = getSTTLanguage();
+            document.documentElement.lang = lang;
+            document.getElementById('textInput').setAttribute('lang', lang);
+            if (recognition) {
+                recognition.lang = lang;
+            }
+        }
+
+        function setSTTUI(active) {
+            isSTTActive = active;
+            document.getElementById('micBtn').classList.toggle('active', active);
+            document.getElementById('mic-svg').classList.toggle('hidden', active);
+            document.getElementById('stop-svg').classList.toggle('hidden', !active);
+            document.getElementById('dictation-bar').classList.toggle('active', active);
+            if (!active) {
+                document.getElementById('interim-text').innerText = "Speaking...";
+            }
+        }
+
+        function renderLocalSTTText() {
+            const combined = [committedText, localSttDraft].filter(Boolean).join(' ').trim();
+            document.getElementById('textInput').value = combined;
+            document.getElementById('interim-text').innerText = localSttDraft || "Speaking...";
+            updateStudioStats();
+        }
+
+        function downsampleBuffer(buffer, inputSampleRate, outputSampleRate = 16000) {
+            if (inputSampleRate === outputSampleRate) return buffer;
+            const ratio = inputSampleRate / outputSampleRate;
+            const newLength = Math.round(buffer.length / ratio);
+            const result = new Float32Array(newLength);
+            let offsetResult = 0;
+            let offsetBuffer = 0;
+            while (offsetResult < result.length) {
+                const nextOffsetBuffer = Math.round((offsetResult + 1) * ratio);
+                let accum = 0;
+                let count = 0;
+                for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                    accum += buffer[i];
+                    count++;
+                }
+                result[offsetResult] = count ? accum / count : 0;
+                offsetResult++;
+                offsetBuffer = nextOffsetBuffer;
+            }
+            return result;
+        }
+
+        function convertFloat32ToInt16(float32Buffer) {
+            const buffer = new ArrayBuffer(float32Buffer.length * 2);
+            const view = new DataView(buffer);
+            for (let i = 0; i < float32Buffer.length; i++) {
+                const sample = Math.max(-1, Math.min(1, float32Buffer[i]));
+                view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+            }
+            return buffer;
+        }
+
+        function cleanupLocalSTTResources() {
+            clearTimeout(localSttStopTimer);
+            localSttStopTimer = null;
+            if (localSttProcessor) {
+                try { localSttProcessor.disconnect(); } catch (e) {}
+                localSttProcessor.onaudioprocess = null;
+                localSttProcessor = null;
+            }
+            if (localSttSource) {
+                try { localSttSource.disconnect(); } catch (e) {}
+                localSttSource = null;
+            }
+            if (localSttStream) {
+                localSttStream.getTracks().forEach(track => track.stop());
+                localSttStream = null;
+            }
+            if (localSttAudioContext) {
+                try { localSttAudioContext.close(); } catch (e) {}
+                localSttAudioContext = null;
+            }
+            if (localSttSocket) {
+                localSttSocket.onopen = null;
+                localSttSocket.onmessage = null;
+                localSttSocket.onerror = null;
+                localSttSocket.onclose = null;
+                try { localSttSocket.close(); } catch (e) {}
+                localSttSocket = null;
+            }
+        }
+
+        async function startLocalSTT(showSwitchToast = false) {
+            if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && (window.AudioContext || window.webkitAudioContext))) {
+                sttDesired = false;
+                showToast("Mic error: local fallback unavailable", "error");
+                return;
+            }
+
+            committedText = document.getElementById('textInput').value.trim();
+            localSttDraft = "";
+            localSttStopping = false;
+            sttMode = 'local';
+            sttFallbackToLocal = false;
+
+            const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
+            localSttSocket = new WebSocket(`${wsProtocol}://${location.host}/ws/stt`);
+            localSttSocket.binaryType = 'arraybuffer';
+
+            localSttSocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                localSttDraft = (data.text || "").trim();
+                renderLocalSTTText();
+
+                if (data.is_final) {
+                    committedText = [committedText, localSttDraft].filter(Boolean).join(' ').trim();
+                    localSttDraft = "";
+                    renderStudioText();
+                }
+            };
+
+            localSttSocket.onerror = () => {
+                if (!localSttStopping) {
+                    sttDesired = false;
+                    showToast("Mic error: network", "error");
+                }
+                cleanupLocalSTTResources();
+                setSTTUI(false);
+                sttMode = 'browser';
+            };
+
+            localSttSocket.onclose = () => {
+                if (localSttStopping && localSttDraft) {
+                    committedText = [committedText, localSttDraft].filter(Boolean).join(' ').trim();
+                    localSttDraft = "";
+                    renderStudioText();
+                }
+                cleanupLocalSTTResources();
+                setSTTUI(false);
+                sttMode = 'browser';
+                localSttStopping = false;
+            };
+
+            localSttSocket.onopen = async () => {
+                try {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    localSttSocket.send(JSON.stringify({ lang: getWhisperLanguage() }));
+                    localSttStream = await navigator.mediaDevices.getUserMedia({
+                        audio: {
+                            channelCount: 1,
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
+                    });
+                    localSttAudioContext = new AudioContextClass();
+                    localSttSource = localSttAudioContext.createMediaStreamSource(localSttStream);
+                    localSttProcessor = localSttAudioContext.createScriptProcessor(4096, 1, 1);
+                    localSttProcessor.onaudioprocess = (audioEvent) => {
+                        if (!localSttSocket || localSttSocket.readyState !== WebSocket.OPEN || !isSTTActive) return;
+                        const input = audioEvent.inputBuffer.getChannelData(0);
+                        const downsampled = downsampleBuffer(input, localSttAudioContext.sampleRate, 16000);
+                        localSttSocket.send(convertFloat32ToInt16(downsampled));
+                    };
+                    localSttSource.connect(localSttProcessor);
+                    localSttProcessor.connect(localSttAudioContext.destination);
+                    setSTTUI(true);
+                    if (showSwitchToast) {
+                        showToast("Browser mic unavailable. Switched to local dictation.", "info");
+                    }
+                } catch (error) {
+                    sttDesired = false;
+                    cleanupLocalSTTResources();
+                    setSTTUI(false);
+                    sttMode = 'browser';
+                    showToast("Mic error: " + (error && error.message ? error.message : "microphone access failed"), "error");
+                }
+            };
+        }
+
+        function stopLocalSTT() {
+            sttDesired = false;
+            localSttStopping = true;
+
+            if (localSttSocket && localSttSocket.readyState === WebSocket.OPEN) {
+                try { localSttSocket.send(new ArrayBuffer(0)); } catch (e) {}
+                clearTimeout(localSttStopTimer);
+                localSttStopTimer = setTimeout(() => {
+                    cleanupLocalSTTResources();
+                    setSTTUI(false);
+                    sttMode = 'browser';
+                    localSttStopping = false;
+                }, 400);
+            } else {
+                cleanupLocalSTTResources();
+                setSTTUI(false);
+                sttMode = 'browser';
+                localSttStopping = false;
+            }
+        }
 
         function setupSTT() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return;
             recognition = new SpeechRecognition();
-            recognition.continuous = true; recognition.interimResults = true;
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = getSTTLanguage();
             recognition.onresult = (e) => {
+                sttLastError = null;
                 let interim = "";
                 for (let i = e.resultIndex; i < e.results.length; ++i) {
                     if (e.results[i].isFinal) {
@@ -610,26 +1258,43 @@
                 updateStudioStats();
             };
             recognition.onstart = () => {
-                isSTTActive = true;
-                document.getElementById('micBtn').classList.add('active');
-                document.getElementById('mic-svg').classList.add('hidden');
-                document.getElementById('stop-svg').classList.remove('hidden');
-                document.getElementById('dictation-bar').classList.add('active');
+                clearTimeout(sttRestartTimer);
+                sttRestartTimer = null;
+                sttMode = 'browser';
+                setSTTUI(true);
             };
             recognition.onerror = (e) => {
+                const error = e && e.error ? e.error : "unknown";
+                sttLastError = error;
+                if (error === 'no-speech') {
+                    return;
+                }
+                if (error === 'network') {
+                    sttFallbackToLocal = true;
+                    return;
+                }
                 sttDesired = false;
-                showToast("Mic error: " + (e && e.error ? e.error : "unknown"), "error");
+                showToast("Mic error: " + error, "error");
             };
             recognition.onend = () => {
-                isSTTActive = false;
-                document.getElementById('micBtn').classList.remove('active');
-                document.getElementById('mic-svg').classList.remove('hidden');
-                document.getElementById('stop-svg').classList.add('hidden');
-                document.getElementById('dictation-bar').classList.remove('active');
+                setSTTUI(false);
 
                 if (sttDesired) {
-                    setTimeout(() => {
-                        try { recognition.start(); } catch (e) {}
+                    if (sttFallbackToLocal || sttLastError === 'network') {
+                        sttFallbackToLocal = false;
+                        startLocalSTT(true);
+                        return;
+                    }
+                    if (sttLastError && sttLastError !== 'no-speech') {
+                        return;
+                    }
+                    clearTimeout(sttRestartTimer);
+                    sttRestartTimer = setTimeout(() => {
+                        try {
+                            applySTTLanguage();
+                            sttLastError = null;
+                            recognition.start();
+                        } catch (e) {}
                     }, 200);
                 }
             };
@@ -647,16 +1312,61 @@
             document.getElementById('char-val').innerText = txt.length;
         }
         function toggleSTT() {
-            if (!recognition) setupSTT();
             if (!isSTTActive) {
                 sttDesired = true;
+                sttLastError = null;
+                sttFallbackToLocal = false;
                 committedText = document.getElementById('textInput').value;
-                try { recognition.start(); } catch (e) {}
+                if (!recognition) setupSTT();
+                applySTTLanguage();
+                if (recognition) {
+                    try {
+                        sttMode = 'browser';
+                        recognition.start();
+                    } catch (e) {
+                        startLocalSTT(false);
+                    }
+                } else {
+                    startLocalSTT(false);
+                }
             } else {
-                sttDesired = false;
-                recognition.stop();
+                if (sttMode === 'local') {
+                    stopLocalSTT();
+                } else {
+                    sttDesired = false;
+                    clearTimeout(sttRestartTimer);
+                    sttRestartTimer = null;
+                    sttLastError = null;
+                    sttFallbackToLocal = false;
+                    recognition.stop();
+                }
             }
         }
+
+        async function stopSTTBeforeGenerate() {
+            if (!isSTTActive) return;
+
+            if (sttMode === 'local') {
+                stopLocalSTT();
+            } else {
+                sttDesired = false;
+                clearTimeout(sttRestartTimer);
+                sttRestartTimer = null;
+                sttLastError = null;
+                sttFallbackToLocal = false;
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    setSTTUI(false);
+                }
+            }
+
+            const deadline = Date.now() + 2000;
+            while (isSTTActive && Date.now() < deadline) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+        }
+
         function clearWorkspace() { document.getElementById('textInput').value = ""; committedText = ""; updateStudioStats(); }
         
         function setPreset(p) {
@@ -666,22 +1376,47 @@
         }
 
         async function generateAudio() {
+            await stopSTTBeforeGenerate();
             const text = document.getElementById('textInput').value.trim();
             if (!text) return;
             const btn = document.getElementById('genBtn');
             const spinner = document.getElementById('genSpinner');
+            const tokensOutput = document.getElementById('tokensOutput');
             btn.disabled = true; spinner.classList.remove('hidden');
+            tokensOutput.innerText = 'Generating neural tokens...';
             try {
-                const res = await fetch('/synthesize', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({text, voice: selectedVoiceId, speed: 1.0})
-                });
-                const blob = await res.blob();
+                const payload = {text, voice: selectedVoiceId, speed: 1.0, translate: true};
+                const [audioRes, tokenRes] = await Promise.all([
+                    fetch('/synthesize', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    }),
+                    fetch('/tokenize', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text, voice: selectedVoiceId, translate: true})
+                    })
+                ]);
+
+                if (!audioRes.ok) throw new Error("Synthesis failed");
+
+                const blob = await audioRes.blob();
                 document.getElementById('genAudio').src = URL.createObjectURL(blob);
                 document.getElementById('genAudio').play();
+
+                if (tokenRes.ok) {
+                    const tokenData = await tokenRes.json();
+                    tokensOutput.innerText = tokenData.phonemes || 'No neural tokens available.';
+                } else {
+                    tokensOutput.innerText = 'Token generation failed.';
+                }
+
                 showToast("Neural master generated", "success");
-            } catch (err) { showToast("Generation failed", "error"); }
+            } catch (err) {
+                tokensOutput.innerText = 'Token generation failed.';
+                showToast("Generation failed", "error");
+            }
             finally { btn.disabled = false; spinner.classList.add('hidden'); }
         }
 
@@ -689,165 +1424,945 @@
         let readerDoc = null;
         let currentPageNum = 0;
         let readerAudio = new Audio();
-        let wordTimings = [];
         let isReading = false;
+        let readerVoiceId = 'af_heart';
+        let readerSpeed = 0.95;
+        let readerSocket = null;
+        let audioQueue = [];
+        let isPlayingChunk = false;
+        let readerStreamDone = false;
+        let currentChunkTiming = [];
+        let readerCurrentChunkText = "";
+        let readerCurrentAudioUrl = null;
+        let readerCurrentWordIndex = 0;
+        let readerHighlightedWordIndex = -1;
+        let readerLastReadWordIndex = -1;
+        let readerPageWordCount = 0;
+        let readerAutoFollowBlockedUntil = 0;
+        let readerProgrammaticScrollUntil = 0;
+        let readerDocVersion = 0;
+        let readerPageData = null;
+        let readerPageLoadVersion = 0;
+        let readerPageLoadingPromise = null;
+        let readerPageIsLoading = false;
+        let readerPageImageReady = false;
+        let readerZoom = 1;
+        const READER_MIN_ZOOM = 0.6;
+        const READER_MAX_ZOOM = 2.4;
+        let readerPdfPinchState = null;
+        let readerGestureStartZoom = 1;
+        let readerWheelPageTurnIntent = 0;
+        let readerPageTurnLockedUntil = 0;
+        const readerPageDataCache = new Map();
+        const readerPageImageCache = new Map();
+
+        function formatReaderSpeed(value) {
+            return `${Number(value).toFixed(2).replace(/\.00$/, '').replace(/0$/, '')}x`;
+        }
+
+        function getVoiceMetaById(id) {
+            for (const lang in allVoices) {
+                const voice = allVoices[lang].find(v => v.id === id);
+                if (voice) return voice;
+            }
+            return null;
+        }
+
+        function setReaderStatus(message) {
+            const el = document.getElementById('reader-status-text');
+            if (el) el.innerText = message;
+        }
+
+        function setReaderFocus(message) {
+            const el = document.getElementById('reader-focus-text');
+            if (el) el.innerText = message;
+        }
+
+        function getReaderCacheKey(pageNum) {
+            return `${readerDocVersion}:${pageNum}`;
+        }
+
+        function resetReaderPageCaches() {
+            readerPageDataCache.clear();
+            readerPageImageCache.clear();
+        }
+
+        async function getReaderPageDataCached(pageNum) {
+            const cacheKey = getReaderCacheKey(pageNum);
+            if (!readerPageDataCache.has(cacheKey)) {
+                readerPageDataCache.set(cacheKey, (async () => {
+                    const res = await fetch(`/pdf-page-data/${pageNum}?doc=${encodeURIComponent(readerDocVersion)}`);
+                    if (!res.ok) throw new Error("Page load failed");
+                    return await res.json();
+                })().catch(error => {
+                    readerPageDataCache.delete(cacheKey);
+                    throw error;
+                }));
+            }
+            return await readerPageDataCache.get(cacheKey);
+        }
+
+        async function preloadReaderPageImage(pageNum) {
+            const cacheKey = getReaderCacheKey(pageNum);
+            if (!readerPageImageCache.has(cacheKey)) {
+                const imageUrl = `/pdf-page-image/${pageNum}?doc=${encodeURIComponent(readerDocVersion)}`;
+                readerPageImageCache.set(cacheKey, new Promise((resolve, reject) => {
+                    const preloader = new Image();
+                    preloader.decoding = 'async';
+                    preloader.onload = async () => {
+                        try {
+                            if (preloader.decode) {
+                                await preloader.decode();
+                            }
+                        } catch (error) {}
+                        resolve(imageUrl);
+                    };
+                    preloader.onerror = () => {
+                        readerPageImageCache.delete(cacheKey);
+                        reject(new Error("Page image load failed"));
+                    };
+                    preloader.src = imageUrl;
+                }));
+            }
+            return await readerPageImageCache.get(cacheKey);
+        }
+
+        function primeReaderNeighborPages(pageNum) {
+            if (!readerDoc) return;
+            [pageNum, pageNum + 1, pageNum + 2, pageNum - 1].forEach(targetPage => {
+                if (targetPage < 0 || targetPage >= readerDoc.total_pages) return;
+                getReaderPageDataCached(targetPage).catch(() => {});
+                preloadReaderPageImage(targetPage).catch(() => {});
+            });
+        }
+
+        function clampReaderZoom(value) {
+            return Math.min(READER_MAX_ZOOM, Math.max(READER_MIN_ZOOM, Number(value) || 1));
+        }
+
+        function updateReaderZoomUI() {
+            const label = document.getElementById('reader-zoom-value');
+            const zoomOutBtn = document.getElementById('reader-zoom-out');
+            const zoomInBtn = document.getElementById('reader-zoom-in');
+            if (label) label.innerText = `${Math.round(readerZoom * 100)}%`;
+            if (zoomOutBtn) zoomOutBtn.disabled = readerZoom <= READER_MIN_ZOOM + 0.001;
+            if (zoomInBtn) zoomInBtn.disabled = readerZoom >= READER_MAX_ZOOM - 0.001;
+        }
+
+        function renderReaderPdfOverlay() {
+            const overlay = document.getElementById('pdf-overlay');
+            const img = document.getElementById('pdfImage');
+            if (!overlay || !img || !readerPageData) return;
+
+            const sx = img.clientWidth / readerPageData.width;
+            const sy = img.clientHeight / readerPageData.height;
+            overlay.innerHTML = '';
+            readerPageData.words.forEach(word => {
+                const d = document.createElement('div');
+                d.className = 'pdf-word-highlight';
+                d.id = `pw-${word.word_index}`;
+                d.style.left = (word.x0 * sx) + 'px';
+                d.style.top = (word.y0 * sy) + 'px';
+                d.style.width = ((word.x1 - word.x0) * sx) + 'px';
+                d.style.height = ((word.y1 - word.y0) * sy) + 'px';
+                overlay.appendChild(d);
+            });
+        }
+
+        function getReaderPdfBox() {
+            return document.getElementById('reader-pdf-box');
+        }
+
+        function resetReaderPageTurnIntent() {
+            readerWheelPageTurnIntent = 0;
+        }
+
+        async function waitForReaderPageReady() {
+            if (readerPageLoadingPromise) {
+                return Boolean(await readerPageLoadingPromise.catch(() => false));
+            }
+            return Boolean(readerPageImageReady);
+        }
+
+        function getReaderZoomAnchor(pdfBox, prevWidth, prevHeight, clientX = null, clientY = null) {
+            if (!pdfBox) {
+                return { xRatio: 0.5, yRatio: 0, localX: 0, localY: 0 };
+            }
+
+            const hasPointer = Number.isFinite(clientX) && Number.isFinite(clientY);
+            const rect = pdfBox.getBoundingClientRect();
+            const localX = hasPointer
+                ? Math.max(0, Math.min(clientX - rect.left, pdfBox.clientWidth))
+                : (pdfBox.clientWidth / 2);
+            const localY = hasPointer
+                ? Math.max(0, Math.min(clientY - rect.top, pdfBox.clientHeight))
+                : (pdfBox.clientHeight / 2);
+
+            return {
+                xRatio: (pdfBox.scrollLeft + localX) / Math.max(prevWidth, 1),
+                yRatio: (pdfBox.scrollTop + localY) / Math.max(prevHeight, 1),
+                localX,
+                localY
+            };
+        }
+
+        function setReaderZoom(nextZoom, { preserveView = true, anchorClientX = null, anchorClientY = null } = {}) {
+            const pdfBox = getReaderPdfBox();
+            const viewport = document.getElementById('pdf-viewport');
+            if (!pdfBox || !viewport || !readerPageData) return;
+
+            const prevWidth = viewport.clientWidth || Math.round(readerPageData.width * readerZoom);
+            const prevHeight = viewport.clientHeight || Math.round(readerPageData.height * readerZoom);
+            const anchor = preserveView
+                ? getReaderZoomAnchor(pdfBox, prevWidth, prevHeight, anchorClientX, anchorClientY)
+                : null;
+
+            const clampedZoom = clampReaderZoom(nextZoom);
+            const zoomChanged = Math.abs(clampedZoom - readerZoom) >= 0.001;
+            readerZoom = clampedZoom;
+            updateReaderZoomUI();
+
+            if (!zoomChanged && preserveView) return;
+
+            viewport.style.width = `${Math.round(readerPageData.width * readerZoom)}px`;
+            viewport.style.height = `${Math.round(readerPageData.height * readerZoom)}px`;
+
+            requestAnimationFrame(() => {
+                renderReaderPdfOverlay();
+                if (!preserveView || !anchor) return;
+
+                const nextWidth = viewport.clientWidth || Math.round(readerPageData.width * readerZoom);
+                const nextHeight = viewport.clientHeight || Math.round(readerPageData.height * readerZoom);
+                pdfBox.scrollLeft = Math.max(0, (anchor.xRatio * nextWidth) - anchor.localX);
+                pdfBox.scrollTop = Math.max(0, (anchor.yRatio * nextHeight) - anchor.localY);
+            });
+        }
+
+        function applyReaderZoom(preserveView = true) {
+            setReaderZoom(readerZoom, { preserveView });
+        }
+
+        function changeReaderZoom(delta) {
+            setReaderZoom(readerZoom + delta, { preserveView: true });
+        }
+
+        function getTouchDistance(touches) {
+            if (!touches || touches.length < 2) return 0;
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function getTouchMidpoint(touches) {
+            return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+            };
+        }
+
+        function bindReaderPdfGestures() {
+            const pdfBox = getReaderPdfBox();
+            if (!pdfBox || pdfBox.dataset.readerZoomBound === '1') return;
+
+            pdfBox.dataset.readerZoomBound = '1';
+
+            pdfBox.addEventListener('wheel', event => {
+                if (!readerPageData) return;
+
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    const zoomFactor = Math.exp(-event.deltaY * 0.0025);
+                    setReaderZoom(readerZoom * zoomFactor, {
+                        preserveView: true,
+                        anchorClientX: event.clientX,
+                        anchorClientY: event.clientY
+                    });
+                    return;
+                }
+
+                if (!readerDoc || Date.now() < readerPageTurnLockedUntil) return;
+
+                const maxScrollTop = Math.max(0, pdfBox.scrollHeight - pdfBox.clientHeight);
+                const atTop = pdfBox.scrollTop <= 2;
+                const atBottom = pdfBox.scrollTop >= maxScrollTop - 2;
+                const direction = Math.sign(event.deltaY);
+
+                if ((direction > 0 && atBottom) || (direction < 0 && atTop)) {
+                    readerWheelPageTurnIntent += event.deltaY;
+                    if (Math.abs(readerWheelPageTurnIntent) > 160) {
+                        readerPageTurnLockedUntil = Date.now() + 700;
+                        resetReaderPageTurnIntent();
+                        event.preventDefault();
+                        changePage(direction > 0 ? 1 : -1);
+                    }
+                } else {
+                    resetReaderPageTurnIntent();
+                }
+            }, { passive: false });
+
+            pdfBox.addEventListener('touchstart', event => {
+                if (!readerPageData || event.touches.length !== 2) {
+                    if (event.touches.length < 2) readerPdfPinchState = null;
+                    return;
+                }
+
+                const midpoint = getTouchMidpoint(event.touches);
+                readerPdfPinchState = {
+                    startDistance: getTouchDistance(event.touches),
+                    startZoom: readerZoom,
+                    anchorClientX: midpoint.x,
+                    anchorClientY: midpoint.y
+                };
+            }, { passive: true });
+
+            pdfBox.addEventListener('touchmove', event => {
+                if (!readerPageData || event.touches.length !== 2 || !readerPdfPinchState) return;
+                event.preventDefault();
+
+                const midpoint = getTouchMidpoint(event.touches);
+                const distance = getTouchDistance(event.touches);
+                const scale = distance / Math.max(readerPdfPinchState.startDistance, 1);
+                setReaderZoom(readerPdfPinchState.startZoom * scale, {
+                    preserveView: true,
+                    anchorClientX: midpoint.x,
+                    anchorClientY: midpoint.y
+                });
+            }, { passive: false });
+
+            const clearPinch = () => {
+                readerPdfPinchState = null;
+                readerGestureStartZoom = readerZoom;
+            };
+
+            pdfBox.addEventListener('touchend', clearPinch, { passive: true });
+            pdfBox.addEventListener('touchcancel', clearPinch, { passive: true });
+
+            pdfBox.addEventListener('gesturestart', event => {
+                if (!readerPageData) return;
+                event.preventDefault();
+                readerGestureStartZoom = readerZoom;
+            });
+
+            pdfBox.addEventListener('gesturechange', event => {
+                if (!readerPageData) return;
+                event.preventDefault();
+                setReaderZoom(readerGestureStartZoom * event.scale, {
+                    preserveView: true,
+                    anchorClientX: event.clientX,
+                    anchorClientY: event.clientY
+                });
+            });
+
+            pdfBox.addEventListener('gestureend', clearPinch);
+            pdfBox.addEventListener('scroll', () => {
+                if (Date.now() >= readerPageTurnLockedUntil) {
+                    resetReaderPageTurnIntent();
+                }
+            }, { passive: true });
+        }
+
+        function getReaderTextPanel() {
+            return document.getElementById('reader-text');
+        }
+
+        function deferReaderAutoFollow(ms = 2800) {
+            readerAutoFollowBlockedUntil = Date.now() + ms;
+        }
+
+        function bindReaderTextPanel() {
+            const panel = getReaderTextPanel();
+            if (!panel || panel.dataset.readerFollowBound === '1') return;
+
+            panel.dataset.readerFollowBound = '1';
+            panel.addEventListener('wheel', () => {
+                if (isReading || readerAudio.src || audioQueue.length) {
+                    deferReaderAutoFollow(3200);
+                }
+            }, { passive: true });
+            panel.addEventListener('touchstart', () => {
+                if (isReading || readerAudio.src || audioQueue.length) {
+                    deferReaderAutoFollow(3200);
+                }
+            }, { passive: true });
+            panel.addEventListener('scroll', () => {
+                if (Date.now() < readerProgrammaticScrollUntil) return;
+                if (isReading || readerAudio.src || audioQueue.length) {
+                    deferReaderAutoFollow(3200);
+                }
+            }, { passive: true });
+        }
+
+        function scrollReaderWordIntoView(textWord, force = false) {
+            const panel = getReaderTextPanel();
+            if (!panel || !textWord) return;
+            if (!force && Date.now() < readerAutoFollowBlockedUntil) return;
+
+            const panelRect = panel.getBoundingClientRect();
+            const wordRect = textWord.getBoundingClientRect();
+            const topSafe = panelRect.top + Math.min(120, panel.clientHeight * 0.22);
+            const bottomSafe = panelRect.bottom - Math.min(150, panel.clientHeight * 0.3);
+
+            if (!force && wordRect.top >= topSafe && wordRect.bottom <= bottomSafe) {
+                return;
+            }
+
+            const wordOffsetTop = (wordRect.top - panelRect.top) + panel.scrollTop;
+            const targetTop = Math.max(
+                0,
+                Math.min(
+                    panel.scrollHeight - panel.clientHeight,
+                    wordOffsetTop - (panel.clientHeight * 0.34)
+                )
+            );
+
+            readerProgrammaticScrollUntil = Date.now() + 700;
+            panel.scrollTo({ top: targetTop, behavior: 'smooth' });
+        }
+
+        function populateReaderVoiceSelect() {
+            const select = document.getElementById('readerVoiceSelect');
+            if (!select) return;
+
+            const desiredVoice = readerVoiceId || selectedVoiceId || 'af_heart';
+            let firstVoiceId = null;
+            let foundDesiredVoice = false;
+            select.innerHTML = '';
+
+            for (const lang in allVoices) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = lang;
+                allVoices[lang].forEach(voice => {
+                    if (!firstVoiceId) firstVoiceId = voice.id;
+                    if (voice.id === desiredVoice) foundDesiredVoice = true;
+                    const option = document.createElement('option');
+                    option.value = voice.id;
+                    option.innerText = `${voice.name} · ${voice.gender}`;
+                    optgroup.appendChild(option);
+                });
+                select.appendChild(optgroup);
+            }
+
+            readerVoiceId = foundDesiredVoice ? desiredVoice : (firstVoiceId || selectedVoiceId || 'af_heart');
+            select.value = readerVoiceId;
+            previewReaderSpeed(readerSpeed);
+        }
+
+        function previewReaderSpeed(value) {
+            const speed = Number(value || readerSpeed);
+            document.getElementById('reader-speed-value').innerText = formatReaderSpeed(speed);
+        }
+
+        function applyReaderSpeed(value) {
+            readerSpeed = Number(value);
+            previewReaderSpeed(readerSpeed);
+            if (readerDoc && (isReading || audioQueue.length > 0 || readerAudio.src)) {
+                restartReaderFromCurrent("Reader pace updated.");
+            }
+        }
+
+        function changeReaderVoice(id) {
+            readerVoiceId = id;
+            const voice = getVoiceMetaById(id);
+            if (voice && readerDoc && !(isReading || audioQueue.length > 0 || readerAudio.src)) {
+                setReaderStatus(`Ready to read with ${voice.name}. Press play or click any word to begin.`);
+            }
+            if (readerDoc && (isReading || audioQueue.length > 0 || readerAudio.src)) {
+                restartReaderFromCurrent("Reader voice updated.");
+            }
+        }
+
+        function clearReaderQueue() {
+            audioQueue.forEach(chunk => {
+                if (chunk.src) URL.revokeObjectURL(chunk.src);
+            });
+            audioQueue = [];
+            if (readerCurrentAudioUrl) {
+                URL.revokeObjectURL(readerCurrentAudioUrl);
+                readerCurrentAudioUrl = null;
+            }
+        }
+
+        function closeReaderSocket() {
+            if (!readerSocket) return;
+            readerSocket.onopen = null;
+            readerSocket.onmessage = null;
+            readerSocket.onerror = null;
+            readerSocket.onclose = null;
+            try { readerSocket.close(); } catch (e) {}
+            readerSocket = null;
+        }
+
+        function clearReaderWordStates(clearRead = true) {
+            const selector = clearRead
+                ? '.reader-word.current, .reader-word.read, .pdf-word-highlight.current, .pdf-word-highlight.read'
+                : '.reader-word.current, .pdf-word-highlight.current';
+            document.querySelectorAll(selector).forEach(el => {
+                el.classList.remove('current');
+                if (clearRead) el.classList.remove('read');
+            });
+        }
+
+        function markReaderWordRead(wordIndex) {
+            const textWord = document.getElementById(`rw-${wordIndex}`);
+            const pdfWord = document.getElementById(`pw-${wordIndex}`);
+            if (textWord) {
+                textWord.classList.remove('current');
+                textWord.classList.add('read');
+            }
+            if (pdfWord) {
+                pdfWord.classList.remove('current');
+                pdfWord.classList.add('read');
+            }
+        }
+
+        function markReaderWordsThrough(wordIndex) {
+            for (let idx = readerLastReadWordIndex + 1; idx <= wordIndex; idx++) {
+                markReaderWordRead(idx);
+            }
+            readerLastReadWordIndex = Math.max(readerLastReadWordIndex, wordIndex);
+        }
+
+        function setReaderWordHighlight(wordIndex) {
+            if (wordIndex === readerHighlightedWordIndex) return;
+
+            if (readerHighlightedWordIndex >= 0) {
+                markReaderWordRead(readerHighlightedWordIndex);
+            }
+
+            for (let idx = readerLastReadWordIndex + 1; idx < wordIndex; idx++) {
+                markReaderWordRead(idx);
+            }
+            readerLastReadWordIndex = Math.max(readerLastReadWordIndex, wordIndex - 1);
+
+            const textWord = document.getElementById(`rw-${wordIndex}`);
+            const pdfWord = document.getElementById(`pw-${wordIndex}`);
+            if (textWord) {
+                textWord.classList.remove('read');
+                textWord.classList.add('current');
+                scrollReaderWordIntoView(textWord);
+                setReaderFocus(textWord.innerText.trim());
+            }
+            if (pdfWord) {
+                pdfWord.classList.remove('read');
+                pdfWord.classList.add('current');
+            }
+
+            readerHighlightedWordIndex = wordIndex;
+            readerCurrentWordIndex = wordIndex;
+        }
+
+        function scaleReaderTiming(timing, duration) {
+            return (timing || []).map(item => {
+                const rawStart = item.start_ratio ?? item.start ?? 0;
+                const rawEnd = item.end_ratio ?? item.end ?? rawStart;
+                return {
+                    ...item,
+                    start: rawStart <= 1.0001 ? rawStart * duration : rawStart,
+                    end: rawEnd <= 1.0001 ? rawEnd * duration : rawEnd
+                };
+            });
+        }
+
+        function finishReaderSession() {
+            isReading = false;
+            isPlayingChunk = false;
+            readerStreamDone = false;
+            updateReaderUI(false);
+            if (readerPageWordCount > 0 && readerCurrentWordIndex >= readerPageWordCount - 1) {
+                readerCurrentWordIndex = 0;
+            }
+            setReaderStatus("Page complete. Press play to read again, or click any word to restart from there.");
+            setReaderFocus("Complete");
+        }
 
         async function handlePDFUpload(e) {
-            const file = e.target.files[0];
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            stopReader();
             const formData = new FormData();
             formData.append('file', file);
-            document.getElementById('reader-text').innerHTML = '<div style="text-align:center; margin-top:5rem;"><div class="spinner" style="display:inline-block;"></div><br>Analyzing Neural Map...</div>';
-            const res = await fetch('/upload-pdf', { method: 'POST', body: formData });
-            readerDoc = await res.json();
-            loadReaderPage(0);
+            setReaderStatus("Analyzing the PDF and building a reading map...");
+            setReaderFocus("Loading");
+            document.getElementById('reader-text').innerHTML = '<div class="reader-empty"><div class="spinner" style="display:inline-block;"></div><div>Analyzing Neural Map...</div></div>';
+
+            try {
+                const res = await fetch('/upload-pdf', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error("Upload failed");
+                readerDoc = await res.json();
+                readerDocVersion = readerDoc.session_version || Date.now();
+                resetReaderPageCaches();
+                readerCurrentWordIndex = 0;
+                primeReaderNeighborPages(0);
+                await loadReaderPage(0);
+            } catch (error) {
+                readerDoc = null;
+                readerDocVersion = 0;
+                resetReaderPageCaches();
+                setReaderStatus("Upload failed. Try another PDF.");
+                setReaderFocus("Idle");
+                document.getElementById('reader-text').innerHTML = '<div class="reader-empty"><div style="font-size: 1.1rem; font-weight: 800;">Upload failed.</div><div>Please try another PDF file.</div></div>';
+                showToast("PDF upload failed", "error");
+            } finally {
+                e.target.value = "";
+            }
         }
 
         async function loadReaderPage(num) {
+            if (!readerDoc) return false;
+
+            const loadVersion = ++readerPageLoadVersion;
+            const pageInfoLabel = `Page ${num + 1} of ${readerDoc.total_pages}`;
+            readerPageIsLoading = true;
+            readerPageImageReady = false;
+
             currentPageNum = num;
-            document.getElementById('reader-page-info').innerText = `Page ${num+1} of ${readerDoc.total_pages}`;
-            document.getElementById('pdfImage').src = `/pdf-page-image/${num}`;
-            const res = await fetch(`/pdf-page-data/${num}`);
-            const data = await res.json();
-            
-            const textPanel = document.getElementById('reader-text');
-            textPanel.innerHTML = '';
-            data.words.forEach(w => {
-                const s = document.createElement('span');
-                s.className = 'reader-word';
-                s.id = `rw-${w.word_index}`;
-                s.innerText = w.text + ' ';
-                s.onclick = () => startReaderAt(w.word_index);
-                textPanel.appendChild(s);
-            });
-            
+            readerCurrentWordIndex = 0;
+            readerHighlightedWordIndex = -1;
+            readerLastReadWordIndex = -1;
+            readerPageWordCount = 0;
+            readerAutoFollowBlockedUntil = 0;
+            readerProgrammaticScrollUntil = 0;
+            readerPageData = null;
+            clearReaderWordStates(true);
+
+            setReaderStatus(`Loading page ${num + 1}...`);
+            setReaderFocus(`Page ${num + 1}`);
             const img = document.getElementById('pdfImage');
-            img.onload = () => {
-                const sx = img.clientWidth / data.width;
-                const sy = img.clientHeight / data.height;
-                const overlay = document.getElementById('pdf-overlay');
-                overlay.innerHTML = '';
-                data.words.forEach(w => {
-                    const d = document.createElement('div');
-                    d.style.position = 'absolute';
-                    d.className = 'pdf-word-highlight';
-                    d.id = `pw-${w.word_index}`;
-                    d.style.left = (w.x0 * sx) + 'px';
-                    d.style.top = (w.y0 * sy) + 'px';
-                    d.style.width = ((w.x1-w.x0)*sx) + 'px';
-                    d.style.height = ((w.y1-w.y0)*sy) + 'px';
-                    overlay.appendChild(d);
-                });
-            };
-        }
+            const overlay = document.getElementById('pdf-overlay');
+            img.onload = null;
+            img.onerror = null;
+            img.style.opacity = '0';
+            overlay.innerHTML = '';
+            let loaded = false;
+            const pageLoadPromise = (async () => {
+                const [data, imageUrl] = await Promise.all([
+                    getReaderPageDataCached(num),
+                    preloadReaderPageImage(num)
+                ]);
+                if (loadVersion !== readerPageLoadVersion || currentPageNum !== num) return false;
 
-        function changePage(d) {
-            let next = currentPageNum + d;
-            if (next >=0 && next < readerDoc.total_pages) loadReaderPage(next);
-        }
+                const textPanel = document.getElementById('reader-text');
+                const pdfBox = document.getElementById('reader-pdf-box');
 
-        let audioQueue = [];
-        let isPlayingChunk = false;
-        let chunkDurationOffset = 0;
+                if (img.src !== imageUrl) {
+                    img.src = imageUrl;
+                }
 
-        async function startReaderAt(idx) {
-            stopReader();
-            isReading = true;
-            updateReaderUI(true);
-            
-            const ws = new WebSocket(`ws://${location.host}/ws/book-reader`);
-            ws.onopen = () => ws.send(JSON.stringify({page_num: currentPageNum, voice: selectedVoiceId, start_word: idx}));
-            
-            ws.onmessage = async (e) => {
-                const d = JSON.parse(e.data);
-                if (d.type === 'audio_with_timing') {
-                    const blob = await (await fetch(`data:audio/wav;base64,${d.audio}`)).blob();
-                    audioQueue.push({
-                        src: URL.createObjectURL(blob),
-                        timing: d.timing
+                if (img.decode) {
+                    try {
+                        await img.decode();
+                    } catch (error) {}
+                }
+
+                if (!img.complete || img.naturalWidth === 0) {
+                    const imageLoaded = await new Promise(resolve => {
+                        if (img.complete && img.naturalWidth > 0) {
+                            resolve(true);
+                            return;
+                        }
+                        img.onload = () => resolve(true);
+                        img.onerror = () => resolve(false);
                     });
-                    if (!isPlayingChunk && isReading) playNextChunk();
+                    if (!imageLoaded) return false;
                 }
-            };
 
-            async function playNextChunk() {
-                if (audioQueue.length === 0 || !isReading) {
-                    isPlayingChunk = false;
-                    return;
+                if (loadVersion !== readerPageLoadVersion || currentPageNum !== num) return false;
+
+                readerPageData = data;
+                readerZoom = 1;
+                updateReaderZoomUI();
+                readerPageWordCount = data.word_count || data.words.length;
+                textPanel.scrollTop = 0;
+                pdfBox.scrollTop = 0;
+                pdfBox.scrollLeft = 0;
+                document.getElementById('reader-page-info').innerText = pageInfoLabel;
+                if (!data.words.length) {
+                    textPanel.innerHTML = '<div class="reader-empty"><div style="font-size: 1.1rem; font-weight: 800;">No readable text found.</div><div>Try another page or another PDF.</div></div>';
+                } else {
+                    textPanel.innerHTML = '';
+                    data.words.forEach(word => {
+                        const span = document.createElement('span');
+                        span.className = 'reader-word';
+                        span.id = `rw-${word.word_index}`;
+                        span.innerText = word.text + ' ';
+                        span.onclick = () => startReaderAt(word.word_index);
+                        textPanel.appendChild(span);
+                    });
                 }
-                isPlayingChunk = true;
-                const chunk = audioQueue.shift();
-                
-                // Store current chunk timing for the loop
-                currentChunkTiming = chunk.timing;
-                readerAudio.src = chunk.src;
-                
-                readerAudio.onloadedmetadata = () => {
-                    if (isReading) {
-                        readerAudio.play();
-                        requestAnimationFrame(readerLoop);
-                    }
-                };
 
-                readerAudio.onended = () => {
-                    playNextChunk();
-                };
+                img.style.opacity = '1';
+                applyReaderZoom(false);
+                primeReaderNeighborPages(num);
+
+                const voice = getVoiceMetaById(readerVoiceId);
+                const voiceName = voice ? voice.name : 'the selected voice';
+                setReaderStatus(`Page ready. Press play to begin with ${voiceName}, or click any word to start from that line.`);
+                setReaderFocus("Ready");
+                return true;
+            })();
+
+            readerPageLoadingPromise = pageLoadPromise;
+            try {
+                loaded = await pageLoadPromise;
+                return loaded;
+            } finally {
+                if (loadVersion === readerPageLoadVersion) {
+                    readerPageIsLoading = false;
+                    readerPageImageReady = loaded;
+                }
+                if (readerPageLoadingPromise === pageLoadPromise) {
+                    readerPageLoadingPromise = null;
+                }
             }
         }
 
-        let currentChunkTiming = [];
+        async function changePage(delta) {
+            if (!readerDoc) return;
+            const next = currentPageNum + delta;
+            if (next >= 0 && next < readerDoc.total_pages && next !== currentPageNum) {
+                stopReader();
+                try {
+                    const loaded = await loadReaderPage(next);
+                    if (loaded && readerPageWordCount > 0) {
+                        startReaderAt(0);
+                    }
+                } catch (error) {
+                    showToast("Failed to load the selected page", "error");
+                }
+            }
+        }
+
+        function restartReaderFromCurrent(message) {
+            if (!readerDoc) return;
+            const restartAt = Math.max(0, Math.min(readerCurrentWordIndex, Math.max(readerPageWordCount - 1, 0)));
+            startReaderAt(restartAt);
+            if (message) showToast(message, "info");
+        }
+
+        function playNextReaderChunk() {
+            if (!isReading) return;
+
+            if (audioQueue.length === 0) {
+                isPlayingChunk = false;
+                if (readerStreamDone) {
+                    finishReaderSession();
+                } else {
+                    setReaderStatus("Buffering the next passage...");
+                    setReaderFocus("Buffering");
+                }
+                return;
+            }
+
+            isPlayingChunk = true;
+            const chunk = audioQueue.shift();
+            readerCurrentChunkText = chunk.text || "Reading...";
+
+            if (readerCurrentAudioUrl) {
+                URL.revokeObjectURL(readerCurrentAudioUrl);
+                readerCurrentAudioUrl = null;
+            }
+
+            readerCurrentAudioUrl = chunk.src;
+            readerAudio.src = chunk.src;
+
+            readerAudio.onloadedmetadata = () => {
+                currentChunkTiming = scaleReaderTiming(chunk.timing, readerAudio.duration || 0);
+                if (currentChunkTiming.length) {
+                    setReaderWordHighlight(currentChunkTiming[0].word_index);
+                }
+                setReaderStatus(readerCurrentChunkText);
+                if (!isReading) return;
+                readerAudio.play().then(() => {
+                    if (isReading) requestAnimationFrame(readerLoop);
+                }).catch(() => {
+                    setReaderStatus("Tap play to continue the narration.");
+                    updateReaderUI(false);
+                });
+            };
+
+            readerAudio.onended = () => {
+                if (currentChunkTiming.length) {
+                    const lastWordIndex = currentChunkTiming[currentChunkTiming.length - 1].word_index;
+                    markReaderWordsThrough(lastWordIndex);
+                    readerCurrentWordIndex = lastWordIndex;
+                    setReaderFocus("Continuing");
+                }
+                currentChunkTiming = [];
+                readerCurrentChunkText = "";
+                isPlayingChunk = false;
+                if (readerCurrentAudioUrl) {
+                    URL.revokeObjectURL(readerCurrentAudioUrl);
+                    readerCurrentAudioUrl = null;
+                }
+                readerAudio.removeAttribute('src');
+                playNextReaderChunk();
+            };
+        }
+
+        async function startReaderAt(idx = 0) {
+            if (!readerDoc) {
+                showToast("Upload a PDF first", "error");
+                return;
+            }
+
+            if (readerPageIsLoading || readerPageLoadingPromise) {
+                setReaderStatus(`Waiting for page ${currentPageNum + 1} to render...`);
+                setReaderFocus(`Page ${currentPageNum + 1}`);
+                const pageReady = await waitForReaderPageReady();
+                if (!pageReady) {
+                    showToast("Page view is still loading. Try again in a moment.", "error");
+                    return;
+                }
+            }
+
+            stopReader();
+            const startIndex = Math.max(0, Math.min(idx, Math.max(readerPageWordCount - 1, 0)));
+            readerCurrentWordIndex = startIndex;
+            readerHighlightedWordIndex = -1;
+            readerLastReadWordIndex = startIndex - 1;
+            clearReaderWordStates(true);
+            isReading = true;
+            isPlayingChunk = false;
+            readerStreamDone = false;
+            updateReaderUI(true);
+            setReaderStatus("Preparing narration...");
+            setReaderFocus("Buffering");
+
+            const wsProtocol = location.protocol === 'https:' ? 'wss' : 'ws';
+            readerSocket = new WebSocket(`${wsProtocol}://${location.host}/ws/book-reader`);
+            readerSocket.onopen = () => {
+                readerSocket.send(JSON.stringify({
+                    page_num: currentPageNum,
+                    voice: readerVoiceId,
+                    speed: readerSpeed,
+                    start_word: startIndex
+                }));
+            };
+
+            readerSocket.onmessage = async (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'audio_with_timing') {
+                    const blob = await (await fetch(`data:audio/wav;base64,${data.audio}`)).blob();
+                    audioQueue.push({
+                        src: URL.createObjectURL(blob),
+                        timing: data.timing || [],
+                        text: data.text || ""
+                    });
+                    if (!isPlayingChunk && isReading) {
+                        playNextReaderChunk();
+                    }
+                } else if (data.type === 'done') {
+                    readerStreamDone = true;
+                    closeReaderSocket();
+                    if (!isPlayingChunk && audioQueue.length === 0) {
+                        finishReaderSession();
+                    }
+                } else if (data.type === 'error') {
+                    showToast(data.msg || "Reader error", "error");
+                    stopReader();
+                }
+            };
+
+            readerSocket.onerror = () => {
+                stopReader();
+                setReaderStatus("Reader connection failed. Press play to try again.");
+                setReaderFocus("Error");
+                showToast("Reader connection failed", "error");
+            };
+
+            readerSocket.onclose = () => {
+                readerSocket = null;
+            };
+        }
 
         function readerLoop() {
             if (!isReading || readerAudio.paused) return;
-            
-            const t = readerAudio.currentTime;
-            const word = currentChunkTiming.find(wt => t >= wt.start && t <= wt.end);
-            
-            if (word) {
-                const s = document.getElementById(`rw-${word.word_index}`);
-                if (s && !s.classList.contains('current')) {
-                    document.querySelectorAll('.reader-word.current').forEach(el => el.classList.remove('current'));
-                    s.classList.add('current'); 
-                    s.scrollIntoView({behavior:'smooth', block:'center'}); 
-                }
-                const ps = document.getElementById(`pw-${word.word_index}`);
-                if (ps && !ps.classList.contains('current')) {
-                    document.querySelectorAll('.pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
-                    ps.classList.add('current');
+
+            const currentTime = readerAudio.currentTime;
+            let activeWord = null;
+            for (const timing of currentChunkTiming) {
+                if (currentTime >= timing.start && currentTime <= timing.end) {
+                    activeWord = timing;
+                    break;
                 }
             }
+
+            if (!activeWord && currentChunkTiming.length && currentTime > currentChunkTiming[currentChunkTiming.length - 1].end) {
+                activeWord = currentChunkTiming[currentChunkTiming.length - 1];
+            }
+
+            if (activeWord) {
+                setReaderWordHighlight(activeWord.word_index);
+            }
+
             requestAnimationFrame(readerLoop);
         }
 
-        function toggleReaderPlay() { 
-            if (isReading) { 
-                // Pause logic
-                isReading = false;
-                readerAudio.pause();
-                updateReaderUI(false);
-            } else { 
-                if (audioQueue.length > 0 || readerAudio.src) {
-                    // Resume logic
-                    isReading = true;
-                    readerAudio.play();
-                    updateReaderUI(true);
-                    requestAnimationFrame(readerLoop);
-                } else {
-                    // Start from beginning or current selection
-                    startReaderAt(0); 
-                }
-            } 
+        function pauseReader() {
+            if (!readerDoc) return;
+            isReading = false;
+            readerAudio.pause();
+            updateReaderUI(false);
+            const currentWord = document.getElementById(`rw-${readerCurrentWordIndex}`)?.innerText?.trim();
+            setReaderStatus(currentWord ? `Paused on "${currentWord}". Press play to continue.` : "Paused. Press play to continue.");
+            setReaderFocus("Paused");
+        }
+
+        function resumeReader() {
+            if (!readerDoc) return;
+            isReading = true;
+            updateReaderUI(true);
+            if (readerAudio.src) {
+                setReaderStatus(readerCurrentChunkText || "Continuing narration...");
+                readerAudio.play().then(() => requestAnimationFrame(readerLoop)).catch(() => {
+                    updateReaderUI(false);
+                });
+            } else {
+                playNextReaderChunk();
+            }
+        }
+
+        function toggleReaderPlay() {
+            if (!readerDoc) {
+                showToast("Upload a PDF first", "error");
+                return;
+            }
+
+            if (isReading) {
+                pauseReader();
+            } else if (audioQueue.length > 0 || readerAudio.src) {
+                resumeReader();
+            } else {
+                startReaderAt(readerCurrentWordIndex || 0);
+            }
         }
 
         function stopReader() {
             isReading = false;
             isPlayingChunk = false;
+            readerStreamDone = false;
             readerAudio.pause();
-            readerAudio.src = "";
-            audioQueue = [];
-            wordTimings = [];
-            chunkDurationOffset = 0;
+            readerAudio.onloadedmetadata = null;
+            readerAudio.onended = null;
+            if (readerAudio.src) {
+                readerAudio.removeAttribute('src');
+                try { readerAudio.load(); } catch (e) {}
+            }
+            closeReaderSocket();
+            clearReaderQueue();
+            currentChunkTiming = [];
+            readerCurrentChunkText = "";
             updateReaderUI(false);
-            document.querySelectorAll('.reader-word.current, .pdf-word-highlight.current').forEach(el => el.classList.remove('current'));
+            clearReaderWordStates(true);
+            readerHighlightedWordIndex = -1;
+            readerLastReadWordIndex = -1;
+            setReaderFocus(readerDoc ? "Ready" : "Idle");
+            if (readerDoc) {
+                const voice = getVoiceMetaById(readerVoiceId);
+                const voiceName = voice ? voice.name : 'the selected voice';
+                setReaderStatus(`Page ready. Press play to begin with ${voiceName}, or click any word to start from that line.`);
+            }
         }
 
         function updateReaderUI(active) {
@@ -856,26 +2371,110 @@
         }
 
         // --- VOICE LAB ---
+        function getVoiceLabStats() {
+            const languages = Object.keys(allVoices);
+            let total = 0;
+            let gradeA = 0;
+            let gradeB = 0;
+
+            languages.forEach(lang => {
+                allVoices[lang].forEach(voice => {
+                    total += 1;
+                    if ((voice.quality || '').toUpperCase() === 'A') gradeA += 1;
+                    else if ((voice.quality || '').toUpperCase() === 'B') gradeB += 1;
+                });
+            });
+
+            return { total, gradeA, gradeB, languages: languages.length };
+        }
+
+        function getVoiceGradeClass(quality) {
+            return (quality || '').toUpperCase() === 'B' ? 'grade-b' : 'grade-a';
+        }
+
+        function getVoiceGradeNote(quality) {
+            return (quality || '').toUpperCase() === 'B'
+                ? 'Registry grade B: alternate voice profile that is still supported for synthesis.'
+                : 'Registry grade A: preferred voice profile in the current curated voice set.';
+        }
+
+        function renderVoiceLabSummary() {
+            const summary = document.getElementById('lab-summary');
+            if (!summary) return;
+
+            const stats = getVoiceLabStats();
+            summary.innerHTML = `
+                <div class="lab-summary-card accent">
+                    <div class="lab-summary-value">${stats.total}</div>
+                    <div class="lab-summary-label">Total Voices</div>
+                    <div class="lab-summary-note">Every profile available to the local neural engine in this workspace.</div>
+                </div>
+                <div class="lab-summary-card">
+                    <div class="lab-summary-value">${stats.gradeA}</div>
+                    <div class="lab-summary-label">Grade A Voices</div>
+                    <div class="lab-summary-note">Preferred registry tier. These are the main recommended voice profiles.</div>
+                </div>
+                <div class="lab-summary-card">
+                    <div class="lab-summary-value">${stats.languages}</div>
+                    <div class="lab-summary-label">Language Families</div>
+                    <div class="lab-summary-note">Grouped by language so you can audit coverage across accents and locales.</div>
+                </div>
+                <div class="lab-summary-card">
+                    <div class="lab-summary-value">${stats.gradeB}</div>
+                    <div class="lab-summary-label">Grade B Voices</div>
+                    <div class="lab-summary-note">Alternate registry tier. Still valid voices, just not marked as the top preferred profile.</div>
+                </div>
+            `;
+        }
+
+        function setVoiceLabStatus(id, message, state = 'pending') {
+            const el = document.getElementById(`status-${id}`);
+            if (!el) return;
+            el.className = `lab-status ${state}`;
+            el.innerText = message;
+        }
+
+        function updateVoiceLabAuditButton() {
+            const btn = document.getElementById('labAuditBtn');
+            if (!btn) return;
+            btn.innerText = isAuditRunning ? 'Stop Audit' : 'Test All Voices';
+            btn.classList.toggle('running', isAuditRunning);
+        }
+
         function renderVoiceLab() {
             const grid = document.getElementById('lab-grid');
             grid.innerHTML = '';
+            renderVoiceLabSummary();
+            updateVoiceLabAuditButton();
+
             for (const lang in allVoices) {
                 allVoices[lang].forEach(v => {
                     const card = document.createElement('div');
                     card.className = 'lab-card';
+                    const voiceInitial = (v.name || '?').charAt(0).toUpperCase();
+                    const quality = (v.quality || 'A').toUpperCase();
                     card.innerHTML = `
+                        <div class="lab-grade ${getVoiceGradeClass(quality)}">Grade ${quality}</div>
                         <div class="lab-card-header">
-                            <div>
-                                <div style="font-weight: 800;">${v.name}</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted);">${lang} | ${v.gender}</div>
+                            <div class="lab-voice-main">
+                                <div class="lab-avatar">${voiceInitial}</div>
+                                <div class="lab-voice-copy">
+                                    <div class="lab-voice-name">${v.name}</div>
+                                    <div class="lab-voice-meta">${lang} · ${v.gender}</div>
+                                    <div class="lab-voice-id">${v.id}</div>
+                                </div>
                             </div>
-                            <div style="color: #fbbf24; font-weight: 800;">${v.quality}</div>
                         </div>
-                        <div style="display: flex; gap: 0.5rem;">
+                        <div class="lab-chip-row">
+                            <div class="lab-chip">${lang}</div>
+                            <div class="lab-chip">${v.gender}</div>
+                        </div>
+                        <div class="lab-card-note">${getVoiceGradeNote(quality)}</div>
+                        <div class="lab-card-actions">
                             <button class="lab-btn" onclick="previewVoice('${v.id}', '${v.name}')">Preview</button>
                             <button class="lab-btn" onclick="testVoice('${v.id}')">Health Check</button>
                         </div>
-                        <div id="status-${v.id}" style="margin-top: 0.75rem; font-size: 0.75rem;">Status: Awaiting...</div>
+                        <div id="status-${v.id}" class="lab-status pending">Awaiting health check.</div>
                     `;
                     grid.appendChild(card);
                 });
@@ -900,27 +2499,29 @@
         }
 
         async function testVoice(id) {
-            const el = document.getElementById(`status-${id}`);
-            el.innerText = "Status: Testing...";
+            setVoiceLabStatus(id, "Running neural health check...", "testing");
             try {
                 const res = await fetch(`/voices/test/${id}`);
                 const data = await res.json();
                 if (data.works) { 
-                    el.innerText = `Status: Working ✓ (${data.latency}ms)`; 
-                    el.style.color = 'var(--success)'; 
+                    setVoiceLabStatus(id, `Ready for synthesis · ${data.latency}ms`, "success");
                 } else { 
-                    el.innerText = "Status: Error ✗"; 
-                    el.style.color = 'var(--error)'; 
+                    setVoiceLabStatus(id, "Health check failed", "error");
                 }
             } catch (err) {
-                el.innerText = "Status: Connection Error";
-                el.style.color = 'var(--error)';
+                setVoiceLabStatus(id, "Connection error during health check", "error");
             }
         }
 
         async function testAllVoices() {
-            if (isAuditRunning) { isAuditRunning = false; return; }
+            if (isAuditRunning) {
+                isAuditRunning = false;
+                updateVoiceLabAuditButton();
+                showToast("Stopping voice audit...", "info");
+                return;
+            }
             isAuditRunning = true;
+            updateVoiceLabAuditButton();
             showToast("Starting mass voice audit...", "info");
             
             const voiceIds = [];
@@ -932,8 +2533,12 @@
                 });
             }
             
+            let stoppedEarly = false;
             for (let i = 0; i < voiceIds.length; i++) {
-                if (!isAuditRunning) break;
+                if (!isAuditRunning) {
+                    stoppedEarly = true;
+                    break;
+                }
                 const id = voiceIds[i];
                 const name = voiceNames[i];
                 
@@ -943,11 +2548,14 @@
                 await new Promise(r => setTimeout(r, 2500));
             }
             isAuditRunning = false;
-            showToast("Mass audio audit complete", "success");
+            updateVoiceLabAuditButton();
+            showToast(stoppedEarly ? "Mass audio audit stopped" : "Mass audio audit complete", stoppedEarly ? "info" : "success");
         }
 
         window.onload = () => { 
             console.log("Studio Initialization Started");
+            bindReaderTextPanel();
+            bindReaderPdfGestures();
             // Load voices in background, don't block the UI
             loadVoices().then(() => {
                 console.log("Neural Voices Loaded");
