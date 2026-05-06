@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+PyMuPDF
+soundfile
+numpy
+nltk
+torch
+openai-whisper
+webrtcvad
+python-dotenv
+sounddevice
+pydantic
+python-multipart
+watchfiles
