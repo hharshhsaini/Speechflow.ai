@@ -1,14 +1,27 @@
+# Core web framework
 fastapi
-uvicorn
-PyMuPDF
-soundfile
-numpy
-nltk
-torch
-openai-whisper
-webrtcvad
-python-dotenv
-sounddevice
-pydantic
+uvicorn[standard]
 python-multipart
-watchfiles
+websockets
+python-dotenv
+pydantic
+
+# Neural TTS engine deps
+torch
+numpy
+soundfile
+scipy
+transformers
+huggingface_hub
+loguru
+misaki[en,ja,zh]>=0.9.4
+
+# PDF engine
+PyMuPDF
+
+# STT engine
+openai-whisper
+
+# Audio utils
+pydub
+webrtcvad-wheels

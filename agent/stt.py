@@ -3,8 +3,14 @@ import io
 import wave
 import torch
 import numpy as np
-import sounddevice as sd
-import webrtcvad
+try:
+    import sounddevice as sd
+except (ImportError, OSError):
+    sd = None  # Not available in Docker/server environments
+try:
+    import webrtcvad
+except (ImportError, OSError):
+    webrtcvad = None
 import whisper
 from dotenv import load_dotenv
 
