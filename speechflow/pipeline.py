@@ -398,13 +398,13 @@ class KPipeline:
             
             # Non-English processing with chunking
             else:
-                # Split long text into smaller chunks (roughly 400 characters each)
+                # Split long text into smaller chunks (roughly 100 characters each for CJK to fit 510 phoneme limit)
                 # Using sentence boundaries when possible
-                chunk_size = 400
+                chunk_size = 100
                 chunks = []
                 
-                # Try to split on sentence boundaries first
-                sentences = re.split(r'([.!?]+)', graphemes)
+                # Try to split on sentence boundaries first, including CJK punctuation
+                sentences = re.split(r'([.!?。！？]+)', graphemes)
                 current_chunk = ""
                 
                 for i in range(0, len(sentences), 2):
