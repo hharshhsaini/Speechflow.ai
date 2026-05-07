@@ -13,11 +13,20 @@ LOCAL_MODEL_PATH = "local_models/kokoro-v1_0.pth"
 LOCAL_CONFIG_PATH = "local_models/config.json"
 LOCAL_VOICES_DIR = "local_models/voices"
 
-if os.path.exists(LOCAL_MODEL_PATH) and os.path.exists(LOCAL_CONFIG_PATH):
-    SHARED_MODEL = KModel(config=LOCAL_CONFIG_PATH, model=LOCAL_MODEL_PATH).eval()
-else:
-    print("Warning: local_models not found. Defaulting to Hugging Face download.")
-    SHARED_MODEL = KModel().eval()
+# LAZY LOADING: Model is loaded on first synthesis request, not at startup.
+# This allows the server to pass health checks before models finish loading.
+_shared_model = None
+
+def get_shared_model():
+    global _shared_model
+    if _shared_model is None:
+        if os.path.exists(LOCAL_MODEL_PATH) and os.path.exists(LOCAL_CONFIG_PATH):
+            print("Loading Kokoro model from local_models/...")
+            _shared_model = KModel(config=LOCAL_CONFIG_PATH, model=LOCAL_MODEL_PATH).eval()
+        else:
+            print("Warning: local_models not found. Downloading from Hugging Face (first request will be slow)...")
+            _shared_model = KModel().eval()
+    return _shared_model
 
 # Cache for pipelines per lang_code
 _pipeline_cache = {}
@@ -256,7 +265,7 @@ def resolve_voice_path(voice: str) -> str:
 def get_pipeline(lang_code: str) -> KPipeline:
     if lang_code not in _pipeline_cache:
         print(f"Initializing pipeline for lang_code: {lang_code}")
-        _pipeline_cache[lang_code] = KPipeline(lang_code=lang_code, model=SHARED_MODEL)
+        _pipeline_cache[lang_code] = KPipeline(lang_code=lang_code, model=get_shared_model())
     return _pipeline_cache[lang_code]
 
 def get_quiet_pipeline(lang_code: str) -> KPipeline:
